@@ -39,8 +39,7 @@ export default function DashboardLayout({
   
   const [walletBalance, setWalletBalance] = useState(0);
 
-  useEffect(() => {
-    const welcomeShown = localStorage.getItem('welcomeShown');
+  const loadUserData = () => {
     const loggedInUserId = localStorage.getItem('loggedInUserId');
     const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
 
@@ -54,21 +53,39 @@ export default function DashboardLayout({
         setUser(dummyUser);
         setWalletBalance(dummyUser.walletBalance);
     }
+  };
+
+
+  useEffect(() => {
+    const welcomeShown = localStorage.getItem('welcomeShown');
+    loadUserData();
     
     if (welcomeShown !== 'true') {
       setShowWelcome(true);
     }
+
+    const handleStorageChange = (e: StorageEvent) => {
+        // When 'users' data changes from another tab (like the admin panel), reload it.
+        if (e.key === 'users') {
+            loadUserData();
+        }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
     
   }, []);
 
   useEffect(() => {
-    // Persist changes to localStorage
+    // Persist changes to localStorage whenever walletBalance or user state changes
     if (user) {
-        localStorage.setItem('walletBalance', String(walletBalance));
         const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
-        
         const loggedInUserId = localStorage.getItem('loggedInUserId');
-        if (loggedInUserId) {
+        
+        if (loggedInUserId && allUsers[loggedInUserId]) {
             allUsers[loggedInUserId] = { ...user, walletBalance };
             localStorage.setItem('users', JSON.stringify(allUsers));
         }
