@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useContext, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
     const { toast } = useToast();
+    const router = useRouter();
     const { user, setUser } = useContext(UserContext);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
@@ -68,6 +70,8 @@ export default function ProfilePage() {
             title: "Profile Updated",
             description: "Your information has been saved successfully.",
         });
+
+        router.push('/dashboard');
     }
 
     if (!user) {
