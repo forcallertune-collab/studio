@@ -5,8 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { youtubeViewTasks } from "@/lib/data";
-import Image from "next/image";
-import placeholderImages from "@/lib/placeholder-images.json";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Play, SkipForward } from "lucide-react";
 
@@ -22,6 +20,10 @@ export default function YoutubeViewsTask() {
 
     const currentTask = youtubeViewTasks[currentTaskIndex];
     const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
+    
+    const videoId = new URL(currentTask.url).searchParams.get('v');
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&mute=1`;
+
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -72,17 +74,22 @@ export default function YoutubeViewsTask() {
             </CardHeader>
             <CardContent>
                 <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
-                    <Image 
-                        src={placeholderImages.placeholderImages[5].imageUrl} 
-                        alt="Video placeholder"
-                        fill
-                        style={{objectFit: 'cover'}}
-                        data-ai-hint={placeholderImages.placeholderImages[5].imageHint}
-                    />
-                    {!isPlaying && timeLeft > 0 && (
-                         <Button size="icon" className="z-10 h-16 w-16 rounded-full" onClick={handlePlay}>
-                             <Play className="h-8 w-8" />
-                         </Button>
+                    {isPlaying ? (
+                        <iframe
+                            key={currentTask.id}
+                            src={embedUrl}
+                            title={currentTask.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                        ></iframe>
+                    ) : (
+                         <div className="w-full h-full bg-black flex items-center justify-center">
+                             <Button size="icon" className="z-10 h-16 w-16 rounded-full" onClick={handlePlay}>
+                                 <Play className="h-8 w-8" />
+                             </Button>
+                         </div>
                     )}
                 </div>
                 <div className="mt-4 space-y-2">
