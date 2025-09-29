@@ -27,12 +27,17 @@ export default function YoutubeViewsTask() {
     const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
     
     const videoId = useMemo(() => {
+        if (!currentTask) return null;
         try {
-            return new URL(currentTask.url).searchParams.get('v');
+            const url = new URL(currentTask.url);
+            if (url.hostname === 'youtu.be') {
+                return url.pathname.slice(1);
+            }
+            return url.searchParams.get('v');
         } catch (e) {
             return null;
         }
-    }, [currentTask.url]);
+    }, [currentTask]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -74,19 +79,30 @@ export default function YoutubeViewsTask() {
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
             if (player) {
-                // The key prop on YouTube component will handle re-mounting
-                // but we can also explicitly stop the video.
                 player.stopVideo();
             }
         }
     };
 
     const handleRestart = () => {
+        setIsAllCompleted(false);
         setCurrentTaskIndex(0);
         setTimeLeft(VIDEO_DURATION);
         setIsPlaying(false);
-        setIsAllCompleted(false);
         setTotalEarnings(0);
+    }
+
+    if (!currentTask) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Loading...</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p>Loading video tasks...</p>
+                </CardContent>
+            </Card>
+        )
     }
 
     return (
@@ -97,9 +113,10 @@ export default function YoutubeViewsTask() {
             </CardHeader>
             <CardContent>
                 <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
-                   <YouTube
+                   {videoId ? (
+                    <YouTube
                         key={currentTaskIndex} // Add key to force re-render
-                        videoId={videoId || ''}
+                        videoId={videoId}
                         opts={{
                             height: '100%',
                             width: '100%',
@@ -112,6 +129,9 @@ export default function YoutubeViewsTask() {
                         onStateChange={onPlayerStateChange}
                         className="w-full h-full"
                     />
+                   ) : (
+                    <p>Could not load video.</p>
+                   )}
                 </div>
                 <div className="mt-4 space-y-2">
                     <h3 className="font-semibold">{currentTask.title}</h3>
