@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import YouTube from 'react-youtube';
 import type { YouTubePlayer } from 'react-youtube';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { youtubeViewTasks } from "@/lib/data";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Play, SkipForward } from "lucide-react";
+import { WalletContext } from "@/app/dashboard/layout";
 
 const TOTAL_VIDEOS = 200;
 const VIDEO_DURATION = 30; // seconds
@@ -20,8 +21,9 @@ export default function YoutubeViewsTask() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isAllCompleted, setIsAllCompleted] = useState(false);
     const [showTaskCompletePopup, setShowTaskCompletePopup] = useState(false);
-    const [totalEarnings, setTotalEarnings] = useState(0);
+    const [sessionEarnings, setSessionEarnings] = useState(0);
     const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+    const { setWalletBalance } = useContext(WalletContext);
 
     const currentTask = useMemo(() => youtubeViewTasks[currentTaskIndex], [currentTaskIndex]);
     const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
@@ -50,7 +52,8 @@ export default function YoutubeViewsTask() {
              if (player) {
                 player.pauseVideo();
             }
-             setTotalEarnings(prev => prev + currentTask.reward);
+             setSessionEarnings(prev => prev + currentTask.reward);
+             setWalletBalance(prev => prev + currentTask.reward);
              if (currentTaskIndex < TOTAL_VIDEOS - 1) {
                  setShowTaskCompletePopup(true);
              } else {
@@ -58,7 +61,7 @@ export default function YoutubeViewsTask() {
              }
         }
         return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player]);
+    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player, setWalletBalance]);
     
     const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
         setPlayer(event.target);
@@ -82,20 +85,18 @@ export default function YoutubeViewsTask() {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
-             if (player) {
-                player.stopVideo();
-             }
+            // No need to call stopVideo here, let the key change handle it
         } else {
             setIsAllCompleted(true);
         }
-    }, [currentTaskIndex, player]);
+    }, [currentTaskIndex]);
 
     const handleRestart = () => {
         setIsAllCompleted(false);
         setCurrentTaskIndex(0);
         setTimeLeft(VIDEO_DURATION);
         setIsPlaying(false);
-        setTotalEarnings(0);
+        setSessionEarnings(0);
     }
 
     if (!currentTask) {
@@ -145,7 +146,7 @@ export default function YoutubeViewsTask() {
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <span>Time left: {timeLeft}s</span>
                         <span>Task: {currentTaskIndex + 1} / {TOTAL_VIDEOS}</span>
-                        <span>Earnings: ₹{totalEarnings.toFixed(2)}</span>
+                        <span>Session Earnings: ₹{sessionEarnings.toFixed(2)}</span>
                     </div>
                 </div>
                  <div className="mt-4">
@@ -160,7 +161,7 @@ export default function YoutubeViewsTask() {
                     <AlertDialogHeader>
                     <AlertDialogTitle className="font-headline">Task Complete!</AlertDialogTitle>
                     <AlertDialogDescription>
-                        You've earned ₹{currentTask.reward.toFixed(2)}. You can now proceed to the next video.
+                        You've earned ₹{currentTask.reward.toFixed(2)}. This has been added to your main wallet.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -174,7 +175,7 @@ export default function YoutubeViewsTask() {
                     <AlertDialogHeader>
                     <AlertDialogTitle className="font-headline">Daily Tasks Complete!</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Congratulations! You've earned ₹{totalEarnings.toFixed(2)} today. 
+                        Congratulations! You've earned a total of ₹{sessionEarnings.toFixed(2)} in this session. 
                         Come back tomorrow for more videos.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
