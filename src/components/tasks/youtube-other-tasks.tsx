@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -48,6 +49,60 @@ const typeConfig = {
     actionText: 'Add Comment',
   },
 };
+
+const getYouTubeVideoId = (url: string) => {
+    try {
+        const urlObj = new URL(url);
+        if (urlObj.hostname === 'youtu.be') {
+            return urlObj.pathname.slice(1);
+        }
+        if (urlObj.hostname.includes('youtube.com')) {
+            return urlObj.searchParams.get('v');
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+const VideoPreviewDialog = ({ task, children }: { task: Task, children: React.ReactNode }) => {
+    const videoId = getYouTubeVideoId(task.url);
+    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
+    const title = 'videoTitle' in task ? task.videoTitle : ('channelName' in task ? task.channelName : '');
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                </DialogHeader>
+                {embedUrl ? (
+                     <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
+                         <iframe
+                            key={task.id}
+                            src={embedUrl}
+                            title={title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                        ></iframe>
+                     </div>
+                ) : <p>Could not load video.</p>}
+                <DialogFooter>
+                    <Button asChild>
+                        <a href={task.url} target="_blank" rel="noopener noreferrer">
+                            Go to YouTube <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 const CommentDialog = ({ task }: { task: CommentTask }) => {
     const { toast } = useToast();
@@ -146,11 +201,11 @@ export default function YoutubeOtherTasks({ type, tasks }: YoutubeOtherTasksProp
                 {type === 'comment' ? (
                    <CommentDialog task={task as CommentTask} />
                 ) : (
-                  <Button asChild size="sm">
-                    <a href={task.url} target="_blank" rel="noopener noreferrer">
-                      {config.actionText} <ExternalLink className="ml-2 h-4 w-4"/>
-                    </a>
-                  </Button>
+                  <VideoPreviewDialog task={task}>
+                    <Button size="sm">
+                      {config.actionText}
+                    </Button>
+                  </VideoPreviewDialog>
                 )}
               </div>
             ))}
