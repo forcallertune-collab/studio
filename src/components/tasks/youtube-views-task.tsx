@@ -1,7 +1,9 @@
 
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import YouTube from 'react-youtube';
+import type { YouTubePlayer } from 'react-youtube';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -18,13 +20,12 @@ export default function YoutubeViewsTask() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
     const [totalEarnings, setTotalEarnings] = useState(0);
+    const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
     const currentTask = youtubeViewTasks[currentTaskIndex];
     const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
     
     const videoId = new URL(currentTask.url).searchParams.get('v');
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&mute=1`;
-
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -43,9 +44,23 @@ export default function YoutubeViewsTask() {
         }
         return () => clearInterval(timer);
     }, [isPlaying, timeLeft, currentTaskIndex, currentTask.reward]);
+    
+    const onPlayerReady = (event: { target: YouTubePlayer }) => {
+        setPlayer(event.target);
+    };
 
+    const onPlayerStateChange = (event: { data: number }) => {
+        // Player state codes: 1 for playing, 2 for paused
+        if (event.data === 1 && timeLeft > 0) { // Playing
+            setIsPlaying(true);
+        } else if (event.data === 2) { // Paused
+            setIsPlaying(false);
+        }
+    };
+    
     const handlePlay = () => {
-        if (timeLeft > 0) {
+        if (player) {
+            player.playVideo();
             setIsPlaying(true);
         }
     };
@@ -54,6 +69,7 @@ export default function YoutubeViewsTask() {
         if (currentTaskIndex < TOTAL_VIDEOS - 1) {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
+            setIsPlaying(false);
         }
     };
 
@@ -75,23 +91,20 @@ export default function YoutubeViewsTask() {
             </CardHeader>
             <CardContent>
                 <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
-                    {isPlaying ? (
-                        <iframe
-                            key={currentTask.id}
-                            src={embedUrl}
-                            title={currentTask.title}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="w-full h-full"
-                        ></iframe>
-                    ) : (
-                         <div className="w-full h-full bg-black flex items-center justify-center">
-                             <Button size="icon" className="z-10 h-16 w-16 rounded-full" onClick={handlePlay}>
-                                 <Play className="h-8 w-8" />
-                             </Button>
-                         </div>
-                    )}
+                   <YouTube
+                        videoId={videoId || ''}
+                        opts={{
+                            height: '100%',
+                            width: '100%',
+                            playerVars: {
+                                autoplay: 0,
+                                controls: 1,
+                            },
+                        }}
+                        onReady={onPlayerReady}
+                        onStateChange={onPlayerStateChange}
+                        className="w-full h-full"
+                    />
                 </div>
                 <div className="mt-4 space-y-2">
                     <h3 className="font-semibold">{currentTask.title}</h3>
