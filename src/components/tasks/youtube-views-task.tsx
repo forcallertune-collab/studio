@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from "react";
@@ -22,7 +23,7 @@ export default function YoutubeViewsTask() {
     const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
     
     const videoId = new URL(currentTask.url).searchParams.get('v');
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&mute=1`;
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&mute=1`;
 
 
     useEffect(() => {
