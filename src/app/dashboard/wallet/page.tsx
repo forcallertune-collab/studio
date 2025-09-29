@@ -52,11 +52,23 @@ export default function WalletPage() {
             return;
         }
 
-        setWalletBalance(prev => prev + amount);
-        toast({
-            title: 'Recharge Successful!',
-            description: `₹${amount.toFixed(2)} has been added to your wallet.`,
-        });
+        // Simulate a payment success/failure
+        const isSuccess = Math.random() > 0.3; // 70% chance of success
+
+        if (isSuccess) {
+            setWalletBalance(prev => prev + amount);
+            toast({
+                title: 'Recharge Successful!',
+                description: `₹${amount.toFixed(2)} has been added to your wallet.`,
+            });
+        } else {
+            toast({
+                title: 'Payment Failed',
+                description: 'There was an issue processing your payment. Please try again.',
+                variant: 'destructive',
+            });
+        }
+        
         setRechargeAmount('');
         setTransactionId('');
     }
