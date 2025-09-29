@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real application, you would verify these against a secure backend.
-    if (email === 'admin@wetube.com' && password === 'admin123') {
+    if (email === 'admin@gamil.com' && password === 'adminvijay') {
       localStorage.setItem('isAdminLoggedIn', 'true');
       toast({
         title: 'Login Successful',
