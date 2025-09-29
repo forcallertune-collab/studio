@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { advertiserServices } from "@/lib/data";
+import { advertiserServices, dummyUser } from "@/lib/data";
 import type { Platform, AdvertiserService } from "@/lib/types";
-import { Rocket, Youtube, Facebook, Instagram } from "lucide-react";
+import { Rocket, Youtube, Facebook, Instagram, Wallet } from "lucide-react";
 
 const platformIcons = {
     youtube: <Youtube className="h-5 w-5" />,
@@ -23,13 +23,34 @@ export default function AdvertiserPage() {
     const [serviceId, setServiceId] = useState<string | null>(null);
     const [link, setLink] = useState('');
     const [quantity, setQuantity] = useState<number | string>('');
+    const [walletBalance, setWalletBalance] = useState(0);
+
+    useEffect(() => {
+        // In a real app, this would be fetched from an API
+        setWalletBalance(dummyUser.walletBalance);
+    }, []);
 
     const handleCreateCampaign = (e: React.FormEvent) => {
         e.preventDefault();
+        if (totalCost > walletBalance) {
+            toast({
+                title: "Insufficient Funds",
+                description: "You do not have enough money in your wallet to place this order.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const newBalance = walletBalance - totalCost;
+        // In a real app, you would send this to the server
+        dummyUser.walletBalance = newBalance; 
+        setWalletBalance(newBalance);
+
         toast({
             title: "Order Placed!",
-            description: "Your campaign is now being processed.",
+            description: `₹${totalCost.toFixed(2)} has been deducted from your wallet.`,
         });
+        
         // Reset form
         setPlatform(null);
         setServiceId(null);
@@ -70,8 +91,19 @@ export default function AdvertiserPage() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-2xl flex items-center gap-2"><Rocket />Create New Order</CardTitle>
-                <CardDescription>Promote your content with our network of active users.</CardDescription>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle className="font-headline text-2xl flex items-center gap-2"><Rocket />Create New Order</CardTitle>
+                        <CardDescription>Promote your content with our network of active users.</CardDescription>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                            <Wallet className="h-4 w-4" />
+                            Balance
+                        </div>
+                        <div className="text-lg font-bold font-headline">₹{walletBalance.toFixed(2)}</div>
+                    </div>
+                </div>
             </CardHeader>
             <form onSubmit={handleCreateCampaign}>
                 <CardContent className="space-y-6">
@@ -169,8 +201,8 @@ export default function AdvertiserPage() {
                     </div>
                 </CardContent>
                 <CardContent>
-                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !quantity}>
-                     Place Order
+                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !quantity || totalCost > walletBalance}>
+                     {totalCost > walletBalance ? 'Insufficient Funds' : 'Place Order'}
                    </Button>
                 </CardContent>
             </form>
