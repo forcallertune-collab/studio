@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState, useEffect } from 'react';
 import {
   Menu,
   Youtube,
@@ -53,9 +53,9 @@ export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { walletBalance } = useContext(WalletContext);
-  const [userRole, setUserRole] = React.useState<'earner' | 'advertiser' | 'both' | null>(null);
+  const [userRole, setUserRole] = useState<'earner' | 'advertiser' | 'both' | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const role = localStorage.getItem('userRole') as 'earner' | 'advertiser' | 'both' | null;
     setUserRole(role);
   }, []);
