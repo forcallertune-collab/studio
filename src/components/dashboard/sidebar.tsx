@@ -15,7 +15,8 @@ import {
   Share2,
   Rocket,
   Info,
-  LifeBuoy
+  LifeBuoy,
+  Shield
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Logo from '../logo';
@@ -46,7 +47,8 @@ const advertiserNavItems = [
 
 const commonBottomItems = [
     { href: '/dashboard/support', icon: LifeBuoy, label: 'Support'},
-    { href: '/about', icon: Info, label: 'About Us' }
+    { href: '/about', icon: Info, label: 'About Us' },
+    { href: '/admin', icon: Shield, label: 'Admin Panel' }
 ]
 
 

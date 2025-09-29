@@ -18,7 +18,8 @@ import {
   LogOut,
   BadgeIndianRupee,
   Home,
-  LifeBuoy
+  LifeBuoy,
+  Shield
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -50,6 +51,7 @@ const allNavItems = [
     { href: '/dashboard/profile', icon: User, label: 'Profile', roles: ['earner', 'advertiser', 'both'] },
     { href: '/dashboard/support', icon: LifeBuoy, label: 'Support', roles: ['earner', 'advertiser', 'both'] },
     { href: '/about', icon: Info, label: 'About Us', roles: ['earner', 'advertiser', 'both'] },
+    { href: '/admin', icon: Shield, label: 'Admin Panel', roles: ['earner', 'advertiser', 'both'] },
   ];
 
 export default function DashboardHeader() {
