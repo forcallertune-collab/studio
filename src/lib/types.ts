@@ -1,3 +1,4 @@
+
 export type User = {
   name: string;
   email: string;
@@ -61,4 +62,11 @@ export type AdvertiserService = {
   icon: React.ElementType;
   min: number;
   max: number;
+};
+
+export type SupportTicket = {
+  id: string;
+  subject: string;
+  status: 'open' | 'closed';
+  lastUpdated: string;
 };

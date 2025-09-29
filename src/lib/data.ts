@@ -1,4 +1,5 @@
-import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask } from './types';
+
+import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket } from './types';
 import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram } from 'lucide-react';
 
 export const dummyUser: User = {
@@ -84,4 +85,10 @@ export const referralChartData = [
   { referrals: 50, earnings: 750 },
   { referrals: 60, earnings: 900 },
   { referrals: 70, earnings: 1050 },
+];
+
+export const dummyTickets: SupportTicket[] = [
+    { id: 'TICKET-7A5B1C', subject: 'Withdrawal not processed', status: 'open', lastUpdated: '2024-07-28' },
+    { id: 'TICKET-9D3E8F', subject: 'Referral bonus not credited', status: 'open', lastUpdated: '2024-07-27' },
+    { id: 'TICKET-4G2H6I', subject: 'Account login issue', status: 'closed', lastUpdated: '2024-07-25' },
 ];
