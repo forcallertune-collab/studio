@@ -35,51 +35,47 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [showWelcome, setShowWelcome] = useState(false);
-  const [user, setUser] = useState<User>(() => {
-    if (typeof window !== 'undefined') {
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        return JSON.parse(savedUser);
-      }
-    }
-    return dummyUser;
-  });
+  const [user, setUser] = useState<User | null>(null);
   
-  const [walletBalance, setWalletBalance] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedBalance = localStorage.getItem('walletBalance');
-      return savedBalance ? parseFloat(savedBalance) : user.walletBalance;
-    }
-    return user.walletBalance;
-  });
+  const [walletBalance, setWalletBalance] = useState(0);
 
   useEffect(() => {
     const welcomeShown = localStorage.getItem('welcomeShown');
-    const role = localStorage.getItem('userRole') as 'earner' | 'advertiser' | 'both' | null;
+    const loggedInUserEmail = localStorage.getItem('loggedInUser');
+    const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
+
+    let currentUser = null;
+    if (loggedInUserEmail && allUsers[loggedInUserEmail]) {
+        currentUser = allUsers[loggedInUserEmail];
+        setUser(currentUser);
+        setWalletBalance(currentUser.walletBalance || 0);
+    } else {
+        // Fallback to dummy user if something is wrong
+        setUser(dummyUser);
+        setWalletBalance(dummyUser.walletBalance);
+    }
     
     if (welcomeShown !== 'true') {
       setShowWelcome(true);
     }
     
-    if (role) {
-        setUser(prevUser => ({...prevUser, role}));
-    }
-
     // Initialize data in localStorage if it's not there
-    if (localStorage.getItem('walletBalance') === null) {
-      localStorage.setItem('walletBalance', String(user.walletBalance));
-    }
-     if (localStorage.getItem('user') === null) {
-      localStorage.setItem('user', JSON.stringify(user));
+    if (localStorage.getItem('walletBalance') === null && currentUser) {
+      localStorage.setItem('walletBalance', String(currentUser.walletBalance));
     }
   }, []);
 
   useEffect(() => {
     // Persist changes to localStorage
-    localStorage.setItem('walletBalance', String(walletBalance));
-    localStorage.setItem('user', JSON.stringify(user));
-     if (user.role) {
-      localStorage.setItem('userRole', user.role);
+    if (user) {
+        localStorage.setItem('walletBalance', String(walletBalance));
+        const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        allUsers[user.email] = { ...user, walletBalance };
+        localStorage.setItem('users', JSON.stringify(allUsers));
+
+        if (user.role) {
+            localStorage.setItem('userRole', user.role);
+        }
     }
   }, [walletBalance, user]);
 
@@ -94,10 +90,10 @@ export default function DashboardLayout({
     setWalletBalance
   }), [walletBalance]);
 
-  const userContextValue = useMemo(() => ({ user, setUser }), [user]);
+  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user]);
 
 
-  if (!user.role) {
+  if (!user || !user.role) {
     // Or a loading spinner
     return null;
   }

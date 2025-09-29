@@ -1,34 +1,85 @@
+
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AtSign, KeyRound, ArrowRight, Users, UserPlus } from 'lucide-react';
+import { AtSign, KeyRound, ArrowRight, Users, UserPlus, User as UserIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Logo from '@/components/logo';
+import { useToast } from '@/hooks/use-toast';
+import type { User } from '@/lib/types';
 
 export default function Home() {
   const router = useRouter();
-  const [role, setRole] = useState('earner');
+  const { toast } = useToast();
+  
+  // Login state
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  // Signup state
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupReferral, setSignupReferral] = useState('');
+  const [role, setRole] = useState<'earner' | 'advertiser' | 'both'>('earner');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy login logic
-    localStorage.setItem('userRole', role);
-    localStorage.setItem('welcomeShown', 'false');
-    router.push('/dashboard');
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[loginEmail] && users[loginEmail].password === loginPassword) {
+      localStorage.setItem('userRole', users[loginEmail].role);
+      localStorage.setItem('welcomeShown', 'false');
+      localStorage.setItem('loggedInUser', loginEmail);
+      router.push('/dashboard');
+    } else {
+        toast({
+            title: "Login Failed",
+            description: "Invalid email or password.",
+            variant: "destructive"
+        });
+    }
   };
   
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy signup logic
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    
+    if (users[signupEmail]) {
+        toast({
+            title: "Signup Failed",
+            description: "An account with this email already exists.",
+            variant: "destructive"
+        });
+        return;
+    }
+
+    const newUser: User = {
+        name: signupName,
+        email: signupEmail,
+        password: signupPassword, // In a real app, this should be hashed
+        role: role,
+        referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
+        walletBalance: 25.00, // Welcome bonus
+    };
+
+    users[signupEmail] = newUser;
+    localStorage.setItem('users', JSON.stringify(users));
+    
     localStorage.setItem('userRole', role);
     localStorage.setItem('welcomeShown', 'false');
+    localStorage.setItem('loggedInUser', signupEmail);
+    
+    toast({
+        title: "Account Created!",
+        description: "Welcome! We've added a bonus of ₹25.00 to your wallet."
+    });
     router.push('/dashboard');
   };
 
@@ -54,11 +105,11 @@ export default function Home() {
                 <CardContent className="space-y-4">
                   <div className="relative">
                     <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email-login" type="email" placeholder="Email or Mobile Number" className="pl-10" required />
+                    <Input id="email-login" type="email" placeholder="Email or Mobile Number" className="pl-10" required value={loginEmail} onChange={e => setLoginEmail(e.target.value)} />
                   </div>
                   <div className="relative">
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="password-login" type="password" placeholder="Password" className="pl-10" required />
+                    <Input id="password-login" type="password" placeholder="Password" className="pl-10" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)} />
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -78,21 +129,25 @@ export default function Home() {
               </CardHeader>
               <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input id="name-signup" type="text" placeholder="Full Name" className="pl-10" required value={signupName} onChange={e => setSignupName(e.target.value)} />
+                  </div>
                    <div className="relative">
                     <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="email-signup" type="email" placeholder="Email or Mobile Number" className="pl-10" required />
+                    <Input id="email-signup" type="email" placeholder="Email or Mobile Number" className="pl-10" required value={signupEmail} onChange={e => setSignupEmail(e.target.value)} />
                   </div>
                   <div className="relative">
                     <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="password-signup" type="password" placeholder="Password" className="pl-10" required />
+                    <Input id="password-signup" type="password" placeholder="Password" className="pl-10" required value={signupPassword} onChange={e => setSignupPassword(e.target.value)} />
                   </div>
                   <div className="relative">
                     <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="referral" type="text" placeholder="Referral Code" className="pl-10" required />
+                    <Input id="referral" type="text" placeholder="Referral Code" className="pl-10" required value={signupReferral} onChange={e => setSignupReferral(e.target.value)} />
                   </div>
                   <div>
                     <Label className="mb-2 block">I am an:</Label>
-                    <RadioGroup defaultValue="earner" value={role} onValueChange={setRole} className="flex space-x-4">
+                    <RadioGroup defaultValue="earner" value={role} onValueChange={(v) => setRole(v as any)} className="flex space-x-4">
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="earner" id="r-earner" />
                         <Label htmlFor="r-earner">Earner</Label>

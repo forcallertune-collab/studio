@@ -66,7 +66,9 @@ export default function DashboardHeader() {
   }, [user.role]);
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('userRole');
+    // We don't clear all of localStorage to preserve user accounts
     router.push('/');
   };
 
@@ -117,7 +119,7 @@ export default function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               <Avatar>
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User avatar" />
+                <AvatarImage src={`https://i.pravatar.cc/150?u=${user.email}`} alt="User avatar" />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>
