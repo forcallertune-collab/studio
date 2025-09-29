@@ -58,13 +58,17 @@ export default function YoutubeViewsTask() {
              }
         }
         return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, currentTaskIndex, currentTask.reward, player]);
+    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player]);
     
     const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
         setPlayer(event.target);
     }, []);
 
     const onPlayerStateChange = useCallback((event: { data: number }) => {
+        // HACK: Sometimes onStateChange is called with a null target.
+        if (!event.target?.getPlayerState) {
+            return;
+        }
         if (event.data === 1 && timeLeft > 0) { // Playing
             setIsPlaying(true);
         } else { // Paused, ended, etc.
@@ -78,10 +82,13 @@ export default function YoutubeViewsTask() {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
+             if (player) {
+                player.stopVideo();
+             }
         } else {
             setIsAllCompleted(true);
         }
-    }, [currentTaskIndex]);
+    }, [currentTaskIndex, player]);
 
     const handleRestart = () => {
         setIsAllCompleted(false);
@@ -90,14 +97,6 @@ export default function YoutubeViewsTask() {
         setIsPlaying(false);
         setTotalEarnings(0);
     }
-    
-    useEffect(() => {
-        // Reset player when task changes
-        if (player) {
-            player.stopVideo();
-        }
-    }, [currentTaskIndex, player]);
-
 
     if (!currentTask) {
         return (
