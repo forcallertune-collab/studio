@@ -14,8 +14,8 @@ export const dummyUser: User = {
 
 export const youtubeViewTasks: VideoTask[] = Array.from({ length: 200 }, (_, i) => ({
   id: `view-${i + 1}`,
-  title: `Exciting Tech Review ${i + 1}`,
-  url: `https://www.youtube.com/watch?v=example${i}`,
+  title: `Watch and Earn Video ${i + 1}`,
+  url: `https://www.youtube.com/watch?v=uwyrSr5tFn4`,
   reward: 0.75,
 }));
 
