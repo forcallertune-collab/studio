@@ -36,6 +36,20 @@ export type CommentTask = {
   templates: string[];
 };
 
+export type FacebookLikeTask = {
+  id: string;
+  pageName: string;
+  url: string;
+  reward: number;
+};
+
+export type FacebookFollowTask = {
+  id: string;
+  pageName: string;
+  url: string;
+  reward: number;
+};
+
 export type AdvertiserService = {
   id: string;
   name: string;

@@ -1,4 +1,4 @@
-import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService } from './types';
+import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask } from './types';
 import { Eye, ThumbsUp, UserPlus, MessageSquare, BadgeIndianRupee, Rocket } from 'lucide-react';
 
 export const dummyUser: User = {
@@ -43,6 +43,20 @@ export const youtubeCommentTasks: CommentTask[] = Array.from({ length: 100 }, (_
     "This is so helpful, thank you!",
     "Can't wait for the next video!"
   ]
+}));
+
+export const facebookLikeTasks: FacebookLikeTask[] = Array.from({ length: 20 }, (_, i) => ({
+    id: `fb-like-${i + 1}`,
+    pageName: `Facebook Page ${i + 1}`,
+    url: `https://www.facebook.com/example${i}`,
+    reward: 0.5,
+}));
+
+export const facebookFollowTasks: FacebookFollowTask[] = Array.from({ length: 20 }, (_, i) => ({
+    id: `fb-follow-${i + 1}`,
+    pageName: `Influencer Profile ${i + 1}`,
+    url: `https://www.facebook.com/example_follow${i}`,
+    reward: 1.0,
 }));
 
 export const advertiserServices: AdvertiserService[] = [
