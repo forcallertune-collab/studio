@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useContext } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +10,7 @@ import ReferralChart from '@/components/referral-chart';
 import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
+import { WalletContext } from './layout';
 
 const quickAccessItems = [
     { title: "YouTube Tasks", description: "Views, Likes, Subs & Comments", href: "/dashboard/tasks/youtube", icon: Youtube },
@@ -14,6 +19,8 @@ const quickAccessItems = [
 ]
 
 export default function DashboardPage() {
+  const { walletBalance } = useContext(WalletContext);
+
   return (
     <div className="grid gap-6">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -24,7 +31,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold font-headline">
-              {dummyUser.walletBalance.toFixed(2)}
+              {walletBalance.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               +₹150.50 from yesterday
