@@ -15,30 +15,23 @@ import { Check, X } from 'lucide-react';
 export default function AdminPaymentsPage() {
     const { toast } = useToast();
     const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
-    const [users, setUsers] = useState<{[key: string]: User}>({});
-
-
+    
     useEffect(() => {
         const savedRequests = localStorage.getItem('paymentRequests');
         if (savedRequests) {
             setPaymentRequests(JSON.parse(savedRequests));
         }
-
-        const savedUsers = localStorage.getItem('users');
-         if (savedUsers) {
-            setUsers(JSON.parse(savedUsers));
-        }
     }, []);
 
     const handleRequestAction = (requestId: string, action: 'approve' | 'reject') => {
         const updatedRequests = paymentRequests.map(req => {
-            if (req.id === requestId) {
+            if (req.id === requestId && req.status === 'pending') {
                 const newStatus = action === 'approve' ? 'approved' : 'rejected';
                 
-                if (newStatus === 'approved' && req.status === 'pending') {
-                    // Find user by userId and update their balance
+                if (newStatus === 'approved') {
+                    // Critical fix: Load the LATEST users data right before updating.
+                    const allUsers: {[key: string]: User} = JSON.parse(localStorage.getItem('users') || '{}');
                     const userId = req.userId;
-                    const allUsers = { ...users };
                     
                     if (allUsers[userId]) {
                         const updatedUser = {
@@ -47,8 +40,8 @@ export default function AdminPaymentsPage() {
                         };
                         allUsers[userId] = updatedUser;
 
+                        // Save the updated users object back to localStorage.
                         localStorage.setItem('users', JSON.stringify(allUsers));
-                        setUsers(allUsers);
 
                         toast({
                             title: 'Payment Approved',
