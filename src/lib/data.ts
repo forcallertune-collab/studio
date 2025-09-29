@@ -1,5 +1,5 @@
 import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask } from './types';
-import { Eye, ThumbsUp, UserPlus, MessageSquare, BadgeIndianRupee, Rocket } from 'lucide-react';
+import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram } from 'lucide-react';
 
 export const dummyUser: User = {
   name: 'Ankit Sharma',
@@ -60,11 +60,20 @@ export const facebookFollowTasks: FacebookFollowTask[] = Array.from({ length: 20
 }));
 
 export const advertiserServices: AdvertiserService[] = [
-  { id: 'subs', name: 'Subscribers', price: '1200', unit: 'per 1k', icon: UserPlus },
-  { id: 'views', name: 'Views', price: '120', unit: 'per 1k', icon: Eye },
-  { id: 'likes', name: 'Likes', price: '120', unit: 'per 1k', icon: ThumbsUp },
-  { id: 'watchtime', name: 'Watch Time', price: '1000', unit: 'per 1k hours', icon: Rocket },
-  { id: 'comments', name: 'Comments', price: '500', unit: 'per 1k', icon: MessageSquare },
+  // YouTube
+  { id: 'yt-subs', platform: 'youtube', name: 'Subscribers', price: 1200, unit: 'per 1k', icon: UserPlus, min: 100, max: 10000 },
+  { id: 'yt-views', platform: 'youtube', name: 'Views', price: 120, unit: 'per 1k', icon: Eye, min: 1000, max: 1000000 },
+  { id: 'yt-likes', platform: 'youtube', name: 'Likes', price: 120, unit: 'per 1k', icon: ThumbsUp, min: 500, max: 50000 },
+  { id: 'yt-watchtime', platform: 'youtube', name: 'Watch Time (Hours)', price: 1000, unit: 'per 1k', icon: Rocket, min: 100, max: 4000 },
+  { id: 'yt-comments', platform: 'youtube', name: 'Comments', price: 500, unit: 'per 1k', icon: MessageSquare, min: 100, max: 10000 },
+  // Facebook
+  { id: 'fb-likes', platform: 'facebook', name: 'Page Likes', price: 800, unit: 'per 1k', icon: ThumbsUp, min: 500, max: 100000 },
+  { id: 'fb-followers', platform: 'facebook', name: 'Followers', price: 850, unit: 'per 1k', icon: UserPlus, min: 500, max: 100000 },
+  { id: 'fb-views', platform: 'facebook', name: 'Video Views', price: 100, unit: 'per 1k', icon: Eye, min: 1000, max: 1000000 },
+   // Instagram
+  { id: 'ig-followers', platform: 'instagram', name: 'Followers', price: 900, unit: 'per 1k', icon: UserPlus, min: 500, max: 50000 },
+  { id: 'ig-likes', platform: 'instagram', name: 'Post Likes', price: 150, unit: 'per 1k', icon: ThumbsUp, min: 500, max: 100000 },
+  { id: 'ig-views', platform: 'instagram', name: 'Video/Reel Views', price: 80, unit: 'per 1k', icon: Eye, min: 1000, max: 2000000 },
 ];
 
 export const referralChartData = [

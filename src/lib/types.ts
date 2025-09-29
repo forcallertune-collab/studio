@@ -50,10 +50,15 @@ export type FacebookFollowTask = {
   reward: number;
 };
 
+export type Platform = 'youtube' | 'facebook' | 'instagram';
+
 export type AdvertiserService = {
   id: string;
+  platform: Platform;
   name: string;
-  price: string;
+  price: number; // Price per 1000
   unit: string;
   icon: React.ElementType;
+  min: number;
+  max: number;
 };
