@@ -2,7 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import {
   Menu,
   Youtube,
