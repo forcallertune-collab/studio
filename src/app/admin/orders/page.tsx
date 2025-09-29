@@ -22,6 +22,22 @@ export default function AdminOrdersPage() {
     });
 
     useEffect(() => {
+        const handleStorageChange = () => {
+            const savedOrders = localStorage.getItem('adminOrders');
+            setOrders(savedOrders ? JSON.parse(savedOrders) : initialOrders);
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Also update on component mount in case of race conditions
+        handleStorageChange();
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
+    useEffect(() => {
         localStorage.setItem('adminOrders', JSON.stringify(orders));
     }, [orders]);
 
@@ -47,6 +63,8 @@ export default function AdminOrdersPage() {
                             <TableHead>Order ID</TableHead>
                             <TableHead>User</TableHead>
                             <TableHead>Service</TableHead>
+                            <TableHead>Link</TableHead>
+                            <TableHead>Quantity</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Date</TableHead>
@@ -58,6 +76,10 @@ export default function AdminOrdersPage() {
                                 <TableCell className="font-medium">{order.id}</TableCell>
                                 <TableCell>{order.user}</TableCell>
                                 <TableCell>{order.service}</TableCell>
+                                <TableCell className="max-w-[150px] truncate">
+                                    <a href={order.link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{order.link}</a>
+                                </TableCell>
+                                <TableCell>{order.quantity?.toLocaleString()}</TableCell>
                                 <TableCell>₹{order.amount.toFixed(2)}</TableCell>
                                 <TableCell>
                                     <Select value={order.status} onValueChange={(value) => handleStatusChange(order.id, value as OrderStatus)}>

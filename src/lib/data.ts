@@ -13,21 +13,6 @@ export const dummyUser: User = {
   upiId: 'ankit.sharma@upi',
 };
 
-const videoUrls = [
-  'https://www.youtube.com/watch?v=LXb3EKWsInQ', // Big Buck Bunny
-  'https://www.youtube.com/watch?v= பேர_vmjBBPE', // Sintel
-  'https://www.youtube.com/watch?v=m-v-p-dJ7pA', // Elephants Dream
-  'https://www.youtube.com/watch?v=t564ksd-uh8', // Tears of Steel
-  'https://www.youtube.com/watch?v=zO8y1gWkffE', // Caminandes 2
-];
-
-export const youtubeViewTasks: VideoTask[] = Array.from({ length: 200 }, (_, i) => ({
-  id: `view-${i + 1}`,
-  title: `Watch and Earn Video ${i + 1}`,
-  url: videoUrls[i % videoUrls.length], // Cycle through the videoUrls array
-  reward: 0.75,
-}));
-
 export const youtubeSubscribeTasks: SubscriptionTask[] = Array.from({ length: 100 }, (_, i) => ({
   id: `sub-${i + 1}`,
   channelName: `Awesome Creator ${i + 1}`,
@@ -73,7 +58,7 @@ export const facebookFollowTasks: FacebookFollowTask[] = Array.from({ length: 20
 export const advertiserServices: AdvertiserService[] = [
   // YouTube
   { id: 'yt-subs', platform: 'youtube', name: 'Subscribers', price: 1200, unit: 'per 1k', icon: UserPlus, min: 100, max: 10000 },
-  { id: 'yt-views', platform: 'youtube', name: 'Views', price: 120, unit: 'per 1k', icon: Eye, min: 1000, max: 1000000 },
+  { id: 'yt-views', platform: 'youtube', name: 'YouTube Views', price: 120, unit: 'per 1k', icon: Eye, min: 1000, max: 1000000 },
   { id: 'yt-likes', platform: 'youtube', name: 'Likes', price: 120, unit: 'per 1k', icon: ThumbsUp, min: 500, max: 50000 },
   { id: 'yt-watchtime', platform: 'youtube', name: 'Watch Time (Hours)', price: 1000, unit: 'per 1k', icon: Rocket, min: 100, max: 4000 },
   { id: 'yt-comments', platform: 'youtube', name: 'Comments', price: 500, unit: 'per 1k', icon: MessageSquare, min: 100, max: 10000 },
@@ -104,9 +89,10 @@ export const initialSupportTickets: SupportTicket[] = [
 ];
 
 export const initialOrders = [
-  { id: 'ORD-001', user: 'Amit Patel', service: 'YouTube Subscribers', amount: 1200, status: 'completed' as const, date: '2024-07-29' },
-  { id: 'ORD-002', user: 'Priya Singh', service: 'Facebook Page Likes', amount: 400, status: 'in progress' as const, date: '2024-07-29' },
-  { id: 'ORD-003', user: 'Rohan Gupta', service: 'Instagram Followers', amount: 900, status: 'completed' as const, date: '2024-07-28' },
-  { id: 'ORD-004', user: 'Sneha Reddy', service: 'YouTube Views', amount: 240, status: 'pending' as const, date: '2024-07-28' },
-  { id: 'ORD-005', user: 'Vikram Kumar', service: 'YouTube Watch Time', amount: 2000, status: 'cancelled' as const, date: '2024-07-27' },
+  { id: 'ORD-001', user: 'Amit Patel', service: 'YouTube Subscribers', amount: 1200, status: 'completed' as const, date: '2024-07-29', link: 'https://youtube.com/example', quantity: 1000 },
+  { id: 'ORD-002', user: 'Priya Singh', service: 'Facebook Page Likes', amount: 400, status: 'in progress' as const, date: '2024-07-29', link: 'https://facebook.com/example', quantity: 500 },
+  { id: 'ORD-003', user: 'Rohan Gupta', service: 'Instagram Followers', amount: 900, status: 'completed' as const, date: '2024-07-28', link: 'https://instagram.com/example', quantity: 1000 },
+  { id: 'ORD-004', user: 'Sneha Reddy', service: 'YouTube Views', amount: 240, status: 'pending' as const, date: '2024-07-28', link: 'https://youtube.com/example2', quantity: 2000 },
+  { id: 'ORD-005', user: 'Vikram Kumar', service: 'YouTube Watch Time', amount: 2000, status: 'cancelled' as const, date: '2024-07-27', link: 'https://youtube.com/example3', quantity: 2000 },
+  { id: 'ORD-006', user: 'Anjali Mehta', service: 'YouTube Views', amount: 120, status: 'in progress' as const, date: '2024-07-30', link: 'https://www.youtube.com/watch?v=LXb3EKWsInQ', quantity: 1000 },
 ];

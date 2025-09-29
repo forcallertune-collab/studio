@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useContext } from "react";
@@ -7,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { advertiserServices } from "@/lib/data";
+import { advertiserServices, initialOrders } from "@/lib/data";
 import type { Platform } from "@/lib/types";
 import { Rocket, Youtube, Facebook, Instagram, Wallet } from "lucide-react";
-import { WalletContext } from "../layout";
+import { WalletContext, UserContext } from "../layout";
 
 const platformIcons = {
     youtube: <Youtube className="h-5 w-5" />,
@@ -21,6 +22,7 @@ const platformIcons = {
 export default function AdvertiserPage() {
     const { toast } = useToast();
     const { walletBalance, setWalletBalance } = useContext(WalletContext);
+    const { user } = useContext(UserContext);
     const [platform, setPlatform] = useState<Platform | null>(null);
     const [serviceId, setServiceId] = useState<string | null>(null);
     const [link, setLink] = useState('');
@@ -28,6 +30,10 @@ export default function AdvertiserPage() {
 
     const handleCreateCampaign = (e: React.FormEvent) => {
         e.preventDefault();
+        const selectedService = advertiserServices.find(s => s.id === serviceId);
+
+        if (!selectedService || !user) return;
+        
         if (totalCost > walletBalance) {
             toast({
                 title: "Insufficient Funds",
@@ -40,9 +46,27 @@ export default function AdvertiserPage() {
         const newBalance = walletBalance - totalCost;
         setWalletBalance(newBalance);
 
+        // Save the new order to localStorage
+        const savedOrders = localStorage.getItem('adminOrders');
+        const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+
+        const newOrder = {
+            id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
+            user: user.name,
+            service: selectedService.name,
+            link: link, // Save the link
+            quantity: Number(quantity), // Save the quantity
+            amount: totalCost,
+            status: 'pending' as const,
+            date: new Date().toISOString().split('T')[0],
+        };
+
+        const updatedOrders = [newOrder, ...orders];
+        localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+
         toast({
             title: "Order Placed!",
-            description: `₹${totalCost.toFixed(2)} has been deducted from your wallet.`,
+            description: `₹${totalCost.toFixed(2)} has been deducted. Your order is pending admin approval.`,
         });
         
         // Reset form

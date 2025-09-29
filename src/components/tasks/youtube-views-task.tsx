@@ -7,15 +7,17 @@ import type { YouTubePlayer } from 'react-youtube';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { youtubeViewTasks } from "@/lib/data";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Play, SkipForward } from "lucide-react";
 import { WalletContext } from "@/app/dashboard/layout";
+import { initialOrders } from "@/lib/data";
+import type { VideoTask } from "@/lib/types";
 
-const TOTAL_VIDEOS = 200;
+
 const VIDEO_DURATION = 30; // seconds
 
 export default function YoutubeViewsTask() {
+    const [tasks, setTasks] = useState<VideoTask[]>([]);
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(VIDEO_DURATION);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -25,7 +27,28 @@ export default function YoutubeViewsTask() {
     const [player, setPlayer] = useState<YouTubePlayer | null>(null);
     const { setWalletBalance } = useContext(WalletContext);
 
-    const currentTask = useMemo(() => youtubeViewTasks[currentTaskIndex], [currentTaskIndex]);
+    useEffect(() => {
+        // Load tasks from localStorage
+        const savedOrders = localStorage.getItem('adminOrders');
+        const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+
+        const viewTasks: VideoTask[] = orders
+            .filter((order: any) => order.service === 'YouTube Views' && order.status === 'in progress')
+            .map((order: any, index: number) => ({
+                id: `view-task-${order.id}-${index}`,
+                title: `Watch video from ${order.user}`,
+                url: order.link,
+                reward: 0.75, // Standard reward
+            }));
+        
+        setTasks(viewTasks);
+        setCurrentTaskIndex(0);
+        setIsAllCompleted(false);
+        setSessionEarnings(0);
+
+    }, []);
+
+    const currentTask = useMemo(() => tasks[currentTaskIndex], [tasks, currentTaskIndex]);
     const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
     
     const videoId = useMemo(() => {
@@ -54,14 +77,14 @@ export default function YoutubeViewsTask() {
             }
              setSessionEarnings(prev => prev + currentTask.reward);
              setWalletBalance(prev => prev + currentTask.reward);
-             if (currentTaskIndex < TOTAL_VIDEOS - 1) {
+             if (currentTaskIndex < tasks.length - 1) {
                  setShowTaskCompletePopup(true);
              } else {
                  setIsAllCompleted(true);
              }
         }
         return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player, setWalletBalance]);
+    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player, setWalletBalance, tasks.length]);
     
     const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
         setPlayer(event.target);
@@ -81,15 +104,15 @@ export default function YoutubeViewsTask() {
     
     const handleNext = useCallback(() => {
         setShowTaskCompletePopup(false);
-        if (currentTaskIndex < TOTAL_VIDEOS - 1) {
+        if (currentTaskIndex < tasks.length - 1) {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
-            // No need to call stopVideo here, let the key change handle it
+            setPlayer(null); // Force re-render of YouTube component
         } else {
             setIsAllCompleted(true);
         }
-    }, [currentTaskIndex]);
+    }, [currentTaskIndex, tasks.length]);
 
     const handleRestart = () => {
         setIsAllCompleted(false);
@@ -99,9 +122,25 @@ export default function YoutubeViewsTask() {
         setSessionEarnings(0);
     }
 
-    if (!currentTask) {
+    if (tasks.length === 0) {
         return (
             <Card>
+                <CardHeader>
+                    <CardTitle>Watch Videos & Earn</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-center py-12 bg-muted/50 rounded-lg">
+                        <p className="text-muted-foreground">No video tasks available right now.</p>
+                        <p className="text-sm text-muted-foreground">Please check back later.</p>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    if (!currentTask) {
+        return (
+             <Card>
                 <CardHeader>
                     <CardTitle>Loading...</CardTitle>
                 </CardHeader>
@@ -116,7 +155,7 @@ export default function YoutubeViewsTask() {
         <Card>
             <CardHeader>
                 <CardTitle>Watch Videos & Earn</CardTitle>
-                <CardDescription>Watch each video for 30 seconds to earn ₹0.75. You can watch up to 200 videos per day.</CardDescription>
+                <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Complete all available tasks to maximize your earnings.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
@@ -145,12 +184,12 @@ export default function YoutubeViewsTask() {
                     <Progress value={progress} />
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <span>Time left: {timeLeft}s</span>
-                        <span>Task: {currentTaskIndex + 1} / {TOTAL_VIDEOS}</span>
+                        <span>Task: {currentTaskIndex + 1} / {tasks.length}</span>
                         <span>Session Earnings: ₹{sessionEarnings.toFixed(2)}</span>
                     </div>
                 </div>
                  <div className="mt-4">
-                    <Button onClick={handleNext} disabled={timeLeft > 0 || currentTaskIndex >= TOTAL_VIDEOS - 1}>
+                    <Button onClick={handleNext} disabled={timeLeft > 0 || currentTaskIndex >= tasks.length - 1}>
                         Next Video <SkipForward className="ml-2 h-4 w-4" />
                     </Button>
                  </div>
@@ -173,7 +212,7 @@ export default function YoutubeViewsTask() {
              <AlertDialog open={isAllCompleted}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle className="font-headline">Daily Tasks Complete!</AlertDialogTitle>
+                    <AlertDialogTitle className="font-headline">All Tasks Complete!</AlertDialogTitle>
                     <AlertDialogDescription>
                         Congratulations! You've earned a total of ₹{sessionEarnings.toFixed(2)} in this session. 
                         Come back tomorrow for more videos.
