@@ -1,8 +1,9 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Wallet, BadgeIndianRupee, History } from "lucide-react";
+import { Wallet, BadgeIndianRupee, History, Copy } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,11 +20,26 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { WalletContext } from '../layout';
+import placeholderImages from '@/lib/placeholder-images.json';
 
 export default function WalletPage() {
     const { walletBalance, setWalletBalance } = useContext(WalletContext);
     const [rechargeAmount, setRechargeAmount] = useState<number | string>('');
+    const [transactionId, setTransactionId] = useState('');
     const { toast } = useToast();
+
+    const generateTransactionId = () => {
+        const newTransactionId = `WETUBE-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        setTransactionId(newTransactionId);
+    }
+
+    const copyTransactionId = () => {
+        if (!transactionId) return;
+        navigator.clipboard.writeText(transactionId);
+        toast({
+            title: "Copied Transaction ID!",
+        });
+    }
 
     const handleRecharge = () => {
         const amount = Number(rechargeAmount);
@@ -42,6 +58,7 @@ export default function WalletPage() {
             description: `₹${amount.toFixed(2)} has been added to your wallet.`,
         });
         setRechargeAmount('');
+        setTransactionId('');
     }
 
     return (
@@ -76,7 +93,7 @@ export default function WalletPage() {
                                     min="1"
                                 />
                             </div>
-                            <AlertDialog>
+                            <AlertDialog onOpenChange={(open) => open && generateTransactionId()}>
                                 <AlertDialogTrigger asChild>
                                     <Button className="w-full sm:w-auto" disabled={!rechargeAmount || Number(rechargeAmount) <= 0}>
                                         Proceed to Add Funds
@@ -84,14 +101,33 @@ export default function WalletPage() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                    <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
+                                    <AlertDialogTitle>Scan to Pay</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        You are about to add ₹{Number(rechargeAmount).toFixed(2)} to your wallet. This is a simulated payment for demonstration purposes.
+                                        Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)} to your wallet.
                                     </AlertDialogDescription>
                                     </AlertDialogHeader>
+                                    <div className='flex flex-col items-center justify-center gap-4 py-4'>
+                                        <Image
+                                            src={placeholderImages.placeholderImages[6].imageUrl}
+                                            alt="QR Code"
+                                            width={200}
+                                            height={200}
+                                            className="rounded-lg border p-1"
+                                            data-ai-hint={placeholderImages.placeholderImages[6].imageHint}
+                                        />
+                                        <div className='text-center'>
+                                            <p className='text-sm text-muted-foreground'>Transaction ID:</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className='font-mono text-sm font-semibold'>{transactionId}</span>
+                                                <Button size="icon" variant="ghost" className='h-7 w-7' onClick={copyTransactionId}>
+                                                    <Copy className='h-4 w-4'/>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleRecharge}>Pay Now</AlertDialogAction>
+                                    <AlertDialogCancel onClick={() => setTransactionId('')}>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleRecharge}>I have paid</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
