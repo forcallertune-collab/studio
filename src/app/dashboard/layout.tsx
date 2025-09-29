@@ -23,7 +23,13 @@ export default function DashboardLayout({
 }) {
   const [showWelcome, setShowWelcome] = useState(false);
   const [userRole, setUserRole] = useState<'earner' | 'advertiser' | 'both' | null>(null);
-  const [walletBalance, setWalletBalance] = useState(dummyUser.walletBalance);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedBalance = localStorage.getItem('walletBalance');
+      return savedBalance ? parseFloat(savedBalance) : dummyUser.walletBalance;
+    }
+    return dummyUser.walletBalance;
+  });
 
   useEffect(() => {
     const welcomeShown = localStorage.getItem('welcomeShown');
@@ -33,7 +39,18 @@ export default function DashboardLayout({
       setShowWelcome(true);
     }
     setUserRole(role);
+
+    // Initialize balance in localStorage if it's not there
+    if (localStorage.getItem('walletBalance') === null) {
+      localStorage.setItem('walletBalance', String(dummyUser.walletBalance));
+    }
   }, []);
+
+  useEffect(() => {
+    // Persist wallet balance changes to localStorage
+    localStorage.setItem('walletBalance', String(walletBalance));
+  }, [walletBalance]);
+
 
   const handleCloseWelcome = () => {
     setShowWelcome(false);

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,20 @@ import { cn } from '@/lib/utils';
 
 export default function SupportPage() {
     const { toast } = useToast();
-    const [tickets, setTickets] = useState<SupportTicket[]>(dummyTickets);
+    const [tickets, setTickets] = useState<SupportTicket[]>(() => {
+        if (typeof window === 'undefined') {
+            return dummyTickets;
+        }
+        const savedTickets = localStorage.getItem('supportTickets');
+        return savedTickets ? JSON.parse(savedTickets) : dummyTickets;
+    });
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        localStorage.setItem('supportTickets', JSON.stringify(tickets));
+    }, [tickets]);
+
 
     const handleSubmitTicket = (e: React.FormEvent) => {
         e.preventDefault();

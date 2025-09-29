@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +19,18 @@ const initialOrders = [
 ];
 
 export default function AdminOrdersPage() {
-    const [orders, setOrders] = useState(initialOrders);
+    const [orders, setOrders] = useState(() => {
+        if (typeof window === 'undefined') {
+            return initialOrders;
+        }
+        const savedOrders = localStorage.getItem('adminOrders');
+        return savedOrders ? JSON.parse(savedOrders) : initialOrders;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('adminOrders', JSON.stringify(orders));
+    }, [orders]);
+
 
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
         setOrders(prevOrders => 
