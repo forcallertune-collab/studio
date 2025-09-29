@@ -1,21 +1,41 @@
+
 'use client';
 
+import React, { useContext, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { dummyUser } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
-import { BadgeIndianRupee, Mail, Smartphone, User, UserPlus } from "lucide-react";
+import { BadgeIndianRupee, Mail, User, UserPlus } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useState } from "react";
+import { UserContext } from "../layout";
 
 export default function ProfilePage() {
     const { toast } = useToast();
-    const [role, setRole] = useState(dummyUser.role);
+    const { user, setUser } = useContext(UserContext);
+    
+    const [name, setName] = useState(user.name);
+    const [email, setEmail] = useState(user.email);
+    const [upiId, setUpiId] = useState(user.upiId || '');
+    const [role, setRole] = useState(user.role);
+
+    useEffect(() => {
+        setName(user.name);
+        setEmail(user.email);
+        setUpiId(user.upiId || '');
+        setRole(user.role);
+    }, [user]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setUser({
+            ...user,
+            name,
+            email,
+            upiId,
+            role
+        });
         toast({
             title: "Profile Updated",
             description: "Your information has been saved successfully.",
@@ -36,14 +56,14 @@ export default function ProfilePage() {
                                 <Label htmlFor="name">Full Name</Label>
                                  <div className="relative">
                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input id="name" defaultValue={dummyUser.name} className="pl-10" />
+                                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="pl-10" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email / Mobile</Label>
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input id="email" defaultValue={dummyUser.email} className="pl-10" />
+                                    <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10" />
                                 </div>
                             </div>
                         </div>
@@ -52,14 +72,14 @@ export default function ProfilePage() {
                                 <Label htmlFor="upiId">UPI ID</Label>
                                  <div className="relative">
                                     <BadgeIndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input id="upiId" defaultValue={dummyUser.upiId} placeholder="your-upi-id@okhdfcbank" className="pl-10" />
+                                    <Input id="upiId" value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="your-upi-id@okhdfcbank" className="pl-10" />
                                 </div>
                             </div>
                              <div className="space-y-2">
                                 <Label htmlFor="referralCode">Your Referral Code</Label>
                                 <div className="relative">
                                     <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input id="referralCode" value={dummyUser.referralCode} readOnly className="pl-10" />
+                                    <Input id="referralCode" value={user.referralCode} readOnly className="pl-10" />
                                 </div>
                             </div>
                         </div>

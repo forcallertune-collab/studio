@@ -36,7 +36,7 @@ import { dummyUser } from '@/lib/data';
 import Logo from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-import { WalletContext } from '@/app/dashboard/layout';
+import { WalletContext, UserContext } from '@/app/dashboard/layout';
 
 const allNavItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard', roles: ['earner', 'advertiser', 'both'] },
@@ -58,17 +58,12 @@ export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { walletBalance } = useContext(WalletContext);
-  const [userRole, setUserRole] = useState<'earner' | 'advertiser' | 'both' | null>(null);
-
-  useEffect(() => {
-    const role = localStorage.getItem('userRole') as 'earner' | 'advertiser' | 'both' | null;
-    setUserRole(role);
-  }, []);
+  const { user } = useContext(UserContext);
 
   const navItems = useMemo(() => {
-    if (!userRole) return [];
-    return allNavItems.filter(item => item.roles.includes(userRole));
-  }, [userRole]);
+    if (!user.role) return [];
+    return allNavItems.filter(item => item.roles.includes(user.role));
+  }, [user.role]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -123,12 +118,12 @@ export default function DashboardHeader() {
             <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               <Avatar>
                 <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User avatar" />
-                <AvatarFallback>{dummyUser.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{dummyUser.name}</DropdownMenuLabel>
+            <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile">Profile</Link>

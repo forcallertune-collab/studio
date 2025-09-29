@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,23 +13,23 @@ import {
 import { Button } from './ui/button';
 import { Gift, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { UserContext } from '@/app/dashboard/layout';
 
 type WelcomeDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  username: string;
-  referralCode: string;
 };
 
-export default function WelcomeDialog({ isOpen, onClose, username, referralCode }: WelcomeDialogProps) {
+export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
   const { toast } = useToast();
+  const { user } = useContext(UserContext);
   const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
     if (isOpen) {
-        setReferralLink(`${window.location.origin}/?ref=${referralCode}`);
+        setReferralLink(`${window.location.origin}/?ref=${user.referralCode}`);
     }
-  }, [isOpen, referralCode]);
+  }, [isOpen, user.referralCode]);
 
   const copyReferralLink = () => {
     if (!referralLink) return;
@@ -45,7 +46,7 @@ export default function WelcomeDialog({ isOpen, onClose, username, referralCode 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-headline text-2xl">
             <Gift className="h-6 w-6 text-primary" />
-            Welcome to WeTube, {username}!
+            Welcome to WeTube, {user.name}!
           </DialogTitle>
           <DialogDescription>
             Watch videos, earn money, and enjoy with family & friends.
@@ -59,7 +60,7 @@ export default function WelcomeDialog({ isOpen, onClose, username, referralCode 
           <div className="grid flex-1 gap-2">
             <p className="text-sm font-semibold">Your Referral Code:</p>
             <div className="flex items-center justify-between rounded-md border bg-muted px-3 py-2">
-                <span className="font-mono text-primary">{referralCode}</span>
+                <span className="font-mono text-primary">{user.referralCode}</span>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={copyReferralLink}>
                     <Copy className="h-4 w-4" />
                 </Button>
