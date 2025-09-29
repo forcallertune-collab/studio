@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { BadgeIndianRupee, Mail, User, UserPlus } from "lucide-react";
+import { BadgeIndianRupee, Mail, User, UserPlus, Image as ImageIcon } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "../layout";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
     const { toast } = useToast();
@@ -20,6 +21,7 @@ export default function ProfilePage() {
     const [email, setEmail] = useState(user.email);
     const [upiId, setUpiId] = useState(user.upiId || '');
     const [role, setRole] = useState(user.role);
+    const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
 
     // Effect to update local state if the user context changes from elsewhere
     useEffect(() => {
@@ -28,6 +30,7 @@ export default function ProfilePage() {
             setEmail(user.email);
             setUpiId(user.upiId || '');
             setRole(user.role);
+            setAvatarUrl(user.avatarUrl || '');
         }
     }, [user]);
 
@@ -43,7 +46,8 @@ export default function ProfilePage() {
                     name,
                     email,
                     upiId,
-                    role
+                    role,
+                    avatarUrl,
                 }
             });
         }
@@ -67,6 +71,27 @@ export default function ProfilePage() {
                         <CardDescription>Update your personal information and payment details.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+
+                        <div className="flex items-center gap-6">
+                            <Avatar className="h-24 w-24">
+                                <AvatarImage src={avatarUrl} alt={name} />
+                                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                             <div className="w-full space-y-2">
+                                <Label htmlFor="avatarUrl">Profile Picture URL</Label>
+                                <div className="relative">
+                                     <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                    <Input 
+                                        id="avatarUrl" 
+                                        value={avatarUrl} 
+                                        onChange={(e) => setAvatarUrl(e.target.value)} 
+                                        placeholder="https://example.com/image.png" 
+                                        className="pl-10" 
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Full Name</Label>

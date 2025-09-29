@@ -117,7 +117,7 @@ export default function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
               <Avatar>
-                <AvatarImage src={`https://i.pravatar.cc/150?u=${user.email}`} alt="User avatar" />
+                <AvatarImage src={user.avatarUrl} alt="User avatar" />
                 <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>

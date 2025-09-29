@@ -11,6 +11,7 @@ export const dummyUser: User = {
   referralCode: 'ANKIT2024',
   walletBalance: 1250.75,
   upiId: 'ankit.sharma@upi',
+  avatarUrl: `https://i.pravatar.cc/150?u=ankit.sharma@example.com`,
 };
 
 export const youtubeSubscribeTasks: SubscriptionTask[] = Array.from({ length: 100 }, (_, i) => ({

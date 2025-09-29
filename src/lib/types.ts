@@ -9,6 +9,7 @@ export type User = {
   referralCode: string;
   walletBalance: number;
   upiId?: string;
+  avatarUrl?: string;
 };
 
 export type VideoTask = {
