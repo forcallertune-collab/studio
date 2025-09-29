@@ -90,7 +90,7 @@ export default function DashboardLayout({
     setWalletBalance
   }), [walletBalance]);
 
-  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user]);
+  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user, setUser]);
 
 
   if (!user || !user.role) {
