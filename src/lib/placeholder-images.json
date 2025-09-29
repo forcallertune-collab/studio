@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "how-to-earn-1",
+      "description": "An image illustrating watching videos on a phone.",
+      "imageUrl": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtb2JpbGUlMjBwaG9uZXxlbnwwfHx8fDE3NTkwNDI0NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mobile phone"
+    },
+    {
+      "id": "how-to-earn-2",
+      "description": "An image showing a network of people, representing a team.",
+      "imageUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0ZWFtJTIwbmV0d29ya3xlbnwwfHx8fDE3NTkxMzUxOTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "team network"
+    },
+    {
+      "id": "how-to-earn-3",
+      "description": "An image of a rocket, symbolizing promotion and growth.",
+      "imageUrl": "https://images.unsplash.com/photo-1517976487492-5750f3195933?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxyb2NrZXQlMjBsYXVuY2h8ZW58MHx8fHwxNzU5MTEzNTk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rocket launch"
+    },
+    {
+      "id": "about-vision",
+      "description": "An image representing vision and future.",
+      "imageUrl": "https://images.unsplash.com/photo-1491774354702-8d6ef0d93426?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx2aXNpb24lMjBmdXR1cmV8ZW58MHx8fHwxNzU5MTM1MTk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vision future"
+    },
+    {
+      "id": "about-community",
+      "description": "An image representing community and collaboration.",
+      "imageUrl": "https://images.unsplash.com/photo-1699371830460-62f0c16ebdea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb21tdW5pdHklMjBjb2xsYWJvcmF0aW9ufGVufDB8fHx8MTc1OTA4NDM4MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community collaboration"
+    },
+    {
+      "id": "video-placeholder",
+      "description": "A placeholder for YouTube videos.",
+      "imageUrl": "https://images.unsplash.com/photo-1662466767333-433cc73ebbb7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMHZpZGVvfGVufDB8fHx8MTc1OTA0MDE5Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract video"
+    }
+  ]
 }
