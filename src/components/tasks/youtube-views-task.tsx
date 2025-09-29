@@ -18,7 +18,8 @@ export default function YoutubeViewsTask() {
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(VIDEO_DURATION);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
+    const [isAllCompleted, setIsAllCompleted] = useState(false);
+    const [showTaskCompletePopup, setShowTaskCompletePopup] = useState(false);
     const [totalEarnings, setTotalEarnings] = useState(0);
     const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
@@ -34,12 +35,14 @@ export default function YoutubeViewsTask() {
                 setTimeLeft(prev => prev - 1);
             }, 1000);
         } else if (timeLeft === 0) {
-            setIsPlaying(false);
-            setTotalEarnings(prev => prev + currentTask.reward);
-            if (currentTaskIndex < TOTAL_VIDEOS - 1) {
-                // Task complete, ready for next
-            } else {
-                setIsCompleted(true);
+            if (isPlaying) { // Only trigger once
+                setIsPlaying(false);
+                setTotalEarnings(prev => prev + currentTask.reward);
+                if (currentTaskIndex < TOTAL_VIDEOS - 1) {
+                    setShowTaskCompletePopup(true);
+                } else {
+                    setIsAllCompleted(true);
+                }
             }
         }
         return () => clearInterval(timer);
@@ -58,14 +61,8 @@ export default function YoutubeViewsTask() {
         }
     };
     
-    const handlePlay = () => {
-        if (player) {
-            player.playVideo();
-            setIsPlaying(true);
-        }
-    };
-
     const handleNext = () => {
+        setShowTaskCompletePopup(false);
         if (currentTaskIndex < TOTAL_VIDEOS - 1) {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
@@ -77,11 +74,9 @@ export default function YoutubeViewsTask() {
         setCurrentTaskIndex(0);
         setTimeLeft(VIDEO_DURATION);
         setIsPlaying(false);
-        setIsCompleted(false);
+        setIsAllCompleted(false);
         setTotalEarnings(0);
     }
-    
-    const earningsToday = 200 * 0.75;
 
     return (
         <Card>
@@ -122,13 +117,27 @@ export default function YoutubeViewsTask() {
                  </div>
             </CardContent>
 
-             <AlertDialog open={isCompleted}>
+             <AlertDialog open={showTaskCompletePopup} onOpenChange={setShowTaskCompletePopup}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle className="font-headline">Task Complete!</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        You've earned ₹{currentTask.reward.toFixed(2)}. You can now proceed to the next video.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogAction onClick={handleNext}>Next Video</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+             <AlertDialog open={isAllCompleted}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                     <AlertDialogTitle className="font-headline">Daily Tasks Complete!</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Thanks! You've earned ₹{earningsToday.toFixed(2)} today. 
-                        Come back tomorrow for 200 more videos.
+                        Congratulations! You've earned ₹{totalEarnings.toFixed(2)} today. 
+                        Come back tomorrow for more videos.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
