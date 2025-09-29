@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useContext } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { advertiserServices, dummyUser } from "@/lib/data";
-import type { Platform, AdvertiserService } from "@/lib/types";
+import { advertiserServices } from "@/lib/data";
+import type { Platform } from "@/lib/types";
 import { Rocket, Youtube, Facebook, Instagram, Wallet } from "lucide-react";
+import { WalletContext } from "../layout";
 
 const platformIcons = {
     youtube: <Youtube className="h-5 w-5" />,
@@ -19,16 +20,11 @@ const platformIcons = {
 
 export default function AdvertiserPage() {
     const { toast } = useToast();
+    const { walletBalance, setWalletBalance } = useContext(WalletContext);
     const [platform, setPlatform] = useState<Platform | null>(null);
     const [serviceId, setServiceId] = useState<string | null>(null);
     const [link, setLink] = useState('');
     const [quantity, setQuantity] = useState<number | string>('');
-    const [walletBalance, setWalletBalance] = useState(0);
-
-    useEffect(() => {
-        // In a real app, this would be fetched from an API
-        setWalletBalance(dummyUser.walletBalance);
-    }, []);
 
     const handleCreateCampaign = (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,8 +38,6 @@ export default function AdvertiserPage() {
         }
 
         const newBalance = walletBalance - totalCost;
-        // In a real app, you would send this to the server
-        dummyUser.walletBalance = newBalance; 
         setWalletBalance(newBalance);
 
         toast({

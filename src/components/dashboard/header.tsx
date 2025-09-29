@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useContext } from 'react';
 import {
   Menu,
   Youtube,
@@ -32,6 +33,7 @@ import { dummyUser } from '@/lib/data';
 import Logo from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { WalletContext } from '@/app/dashboard/layout';
 
 const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -50,6 +52,7 @@ const navItems = [
 export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
+  const { walletBalance } = useContext(WalletContext);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -97,7 +100,7 @@ export default function DashboardHeader() {
             <div className="p-1.5 bg-accent rounded-full">
                 <BadgeIndianRupee className="h-4 w-4 text-white"/>
             </div>
-          <span>{dummyUser.walletBalance.toFixed(2)}</span>
+          <span>{walletBalance.toFixed(2)}</span>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
