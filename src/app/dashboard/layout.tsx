@@ -31,7 +31,6 @@ export default function DashboardLayout({
     
     if (welcomeShown !== 'true') {
       setShowWelcome(true);
-      setWalletBalance(prev => prev + 100); // Add welcome bonus
     }
     setUserRole(role);
   }, []);
