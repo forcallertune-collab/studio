@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Wallet, BadgeIndianRupee, History, Copy } from "lucide-react";
@@ -45,11 +45,7 @@ export default function WalletPage() {
     }
 
     const handlePaymentRequest = () => {
-        const loggedInUserId = localStorage.getItem('loggedInUserId');
-        const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
-        const currentUser = allUsers[loggedInUserId || ''];
-
-        if (!currentUser) {
+        if (!user || !user.userId) {
              toast({
                 title: 'Error',
                 description: 'You must be logged in to make a payment request.',
@@ -73,8 +69,8 @@ export default function WalletPage() {
 
         const newRequest: PaymentRequest = {
             id: transactionId,
-            userId: currentUser.userId, // Use the stable userId of the logged-in user
-            userEmail: currentUser.email,
+            userId: user.userId, // Use the stable userId of the logged-in user from context
+            userEmail: user.email,
             amount,
             status: 'pending',
             date: new Date().toISOString(),
