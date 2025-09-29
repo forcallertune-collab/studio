@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Share2, Users, BadgeIndianRupee } from "lucide-react";
@@ -9,10 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ReferralsPage() {
     const { toast } = useToast();
+    const [referralLink, setReferralLink] = useState('');
+
+    useEffect(() => {
+        setReferralLink(`${window.location.origin}/?ref=${dummyUser.referralCode}`);
+    }, []);
 
     const copyReferralLink = () => {
-        const link = `${window.location.origin}/?ref=${dummyUser.referralCode}`;
-        navigator.clipboard.writeText(link);
+        if (!referralLink) return;
+        navigator.clipboard.writeText(referralLink);
         toast({
             title: "Copied to clipboard!",
             description: "Your referral link is ready to be shared.",
@@ -30,10 +36,16 @@ export default function ReferralsPage() {
                     <div className="p-4 text-center bg-primary/10 rounded-lg border border-primary/20">
                         <p className="font-semibold text-lg">Your Unique Referral Link</p>
                         <div className="mt-2 flex items-center justify-center gap-2">
-                            <p className="text-sm md:text-base p-2 bg-background rounded-md font-mono text-primary truncate">{`${window.location.origin}/?ref=${dummyUser.referralCode}`}</p>
-                            <Button onClick={copyReferralLink} size="icon" variant="outline">
-                                <Copy className="h-4 w-4" />
-                            </Button>
+                            {referralLink ? (
+                                <>
+                                    <p className="text-sm md:text-base p-2 bg-background rounded-md font-mono text-primary truncate">{referralLink}</p>
+                                    <Button onClick={copyReferralLink} size="icon" variant="outline">
+                                        <Copy className="h-4 w-4" />
+                                    </Button>
+                                </>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">Generating link...</p>
+                            )}
                         </div>
                     </div>
                     <div className="grid md:grid-cols-3 gap-4 text-center">

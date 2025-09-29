@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -21,10 +22,17 @@ type WelcomeDialogProps = {
 
 export default function WelcomeDialog({ isOpen, onClose, username, referralCode }: WelcomeDialogProps) {
   const { toast } = useToast();
+  const [referralLink, setReferralLink] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+        setReferralLink(`${window.location.origin}/?ref=${referralCode}`);
+    }
+  }, [isOpen, referralCode]);
 
   const copyReferralLink = () => {
-    const link = `${window.location.origin}/?ref=${referralCode}`;
-    navigator.clipboard.writeText(link);
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink);
     toast({
       title: 'Copied to clipboard!',
       description: 'Your referral link is ready to be shared.',
