@@ -1,4 +1,5 @@
 
+
 export type User = {
   name: string;
   email: string;
@@ -70,3 +71,11 @@ export type SupportTicket = {
   status: 'open' | 'closed';
   lastUpdated: string;
 };
+
+export type PaymentRequest = {
+    id: string;
+    userEmail: string;
+    amount: number;
+    status: 'pending' | 'approved' | 'rejected';
+    date: string;
+}

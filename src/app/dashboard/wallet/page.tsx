@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext, useState, useEffect } from 'react';
@@ -21,6 +22,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { WalletContext } from '../layout';
 import placeholderImages from '@/lib/placeholder-images.json';
+import { dummyUser } from '@/lib/data';
+import type { PaymentRequest } from '@/lib/types';
 
 export default function WalletPage() {
     const { walletBalance, setWalletBalance } = useContext(WalletContext);
@@ -41,33 +44,35 @@ export default function WalletPage() {
         });
     }
 
-    const handleRecharge = () => {
+    const handlePaymentRequest = () => {
         const amount = Number(rechargeAmount);
-        if (amount <= 0) {
+        if (amount <= 0 || !transactionId) {
             toast({
-                title: 'Invalid Amount',
-                description: 'Please enter an amount greater than zero.',
+                title: 'Invalid Request',
+                description: 'Please enter a valid amount and generate a transaction ID.',
                 variant: 'destructive',
             });
             return;
         }
 
-        // Simulate a payment success/failure
-        const isSuccess = Math.random() > 0.3; // 70% chance of success
+        const savedRequests = localStorage.getItem('paymentRequests');
+        const paymentRequests: PaymentRequest[] = savedRequests ? JSON.parse(savedRequests) : [];
 
-        if (isSuccess) {
-            setWalletBalance(prev => prev + amount);
-            toast({
-                title: 'Recharge Successful!',
-                description: `₹${amount.toFixed(2)} has been added to your wallet.`,
-            });
-        } else {
-            toast({
-                title: 'Payment Failed',
-                description: 'There was an issue processing your payment. Please try again.',
-                variant: 'destructive',
-            });
-        }
+        const newRequest: PaymentRequest = {
+            id: transactionId,
+            userEmail: dummyUser.email,
+            amount,
+            status: 'pending',
+            date: new Date().toISOString(),
+        };
+
+        paymentRequests.push(newRequest);
+        localStorage.setItem('paymentRequests', JSON.stringify(paymentRequests));
+
+        toast({
+            title: 'Request Submitted',
+            description: 'Your payment is being processed. Please wait for admin approval.',
+        });
         
         setRechargeAmount('');
         setTransactionId('');
@@ -115,7 +120,7 @@ export default function WalletPage() {
                                     <AlertDialogHeader>
                                     <AlertDialogTitle>Scan to Pay</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)} to your wallet.
+                                        Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)} to your wallet. After paying, click "I have paid".
                                     </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <div className='flex flex-col items-center justify-center gap-4 py-4'>
@@ -139,7 +144,7 @@ export default function WalletPage() {
                                     </div>
                                     <AlertDialogFooter>
                                     <AlertDialogCancel onClick={() => setTransactionId('')}>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleRecharge}>I have paid</AlertDialogAction>
+                                    <AlertDialogAction onClick={handlePaymentRequest}>I have paid</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
