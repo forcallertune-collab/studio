@@ -1,6 +1,7 @@
 
 
 export type User = {
+  userId: string; // Add a stable user ID
   name: string;
   email: string;
   password?: string; // Should be hashed in a real app

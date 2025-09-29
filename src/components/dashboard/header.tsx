@@ -66,9 +66,7 @@ export default function DashboardHeader() {
   }, [user.role]);
 
   const handleLogout = () => {
-    localStorage.removeItem('loggedInUser');
-    localStorage.removeItem('userRole');
-    // We don't clear all of localStorage to preserve user accounts
+    localStorage.removeItem('loggedInUserId');
     router.push('/');
   };
 

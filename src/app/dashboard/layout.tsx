@@ -41,12 +41,12 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const welcomeShown = localStorage.getItem('welcomeShown');
-    const loggedInUserEmail = localStorage.getItem('loggedInUser');
+    const loggedInUserId = localStorage.getItem('loggedInUserId');
     const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
 
     let currentUser = null;
-    if (loggedInUserEmail && allUsers[loggedInUserEmail]) {
-        currentUser = allUsers[loggedInUserEmail];
+    if (loggedInUserId && allUsers[loggedInUserId]) {
+        currentUser = allUsers[loggedInUserId];
         setUser(currentUser);
         setWalletBalance(currentUser.walletBalance || 0);
     } else {
@@ -67,16 +67,11 @@ export default function DashboardLayout({
         localStorage.setItem('walletBalance', String(walletBalance));
         const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
         
-        // Use the original email to find the user in case it's being changed.
-        const loggedInUserEmail = localStorage.getItem('loggedInUser');
-        if (loggedInUserEmail && loggedInUserEmail !== user.email) {
-             // If email is changed, delete old entry
-            delete allUsers[loggedInUserEmail];
-            localStorage.setItem('loggedInUser', user.email);
+        const loggedInUserId = localStorage.getItem('loggedInUserId');
+        if (loggedInUserId) {
+            allUsers[loggedInUserId] = { ...user, walletBalance };
+            localStorage.setItem('users', JSON.stringify(allUsers));
         }
-
-        allUsers[user.email] = { ...user, walletBalance };
-        localStorage.setItem('users', JSON.stringify(allUsers));
 
         if (user.role) {
             localStorage.setItem('userRole', user.role);

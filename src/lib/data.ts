@@ -3,6 +3,7 @@ import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, Advertis
 import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram } from 'lucide-react';
 
 export const dummyUser: User = {
+  userId: 'dummy-user-01',
   name: 'Ankit Sharma',
   email: 'ankit.sharma@example.com',
   role: 'both',

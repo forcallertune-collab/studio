@@ -33,10 +33,11 @@ export default function Home() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem('users') || '{}');
-    if (users[loginEmail] && users[loginEmail].password === loginPassword) {
-      localStorage.setItem('userRole', users[loginEmail].role);
+    const user = Object.values(users).find((u: any) => u.email === loginEmail && u.password === loginPassword) as User | undefined;
+
+    if (user) {
+      localStorage.setItem('loggedInUserId', user.userId); // Save userId instead of email
       localStorage.setItem('welcomeShown', 'false');
-      localStorage.setItem('loggedInUser', loginEmail);
       router.push('/dashboard');
     } else {
         toast({
@@ -51,7 +52,8 @@ export default function Home() {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem('users') || '{}');
     
-    if (users[signupEmail]) {
+    const emailExists = Object.values(users).some((u: any) => u.email === signupEmail);
+    if (emailExists) {
         toast({
             title: "Signup Failed",
             description: "An account with this email already exists.",
@@ -60,7 +62,9 @@ export default function Home() {
         return;
     }
 
+    const userId = `user_${new Date().getTime()}`;
     const newUser: User = {
+        userId,
         name: signupName,
         email: signupEmail,
         password: signupPassword, // In a real app, this should be hashed
@@ -69,12 +73,11 @@ export default function Home() {
         walletBalance: 25.00, // Welcome bonus
     };
 
-    users[signupEmail] = newUser;
+    users[userId] = newUser; // Use userId as the key
     localStorage.setItem('users', JSON.stringify(users));
     
-    localStorage.setItem('userRole', role);
+    localStorage.setItem('loggedInUserId', userId); // Save userId instead of email
     localStorage.setItem('welcomeShown', 'false');
-    localStorage.setItem('loggedInUser', signupEmail);
     
     toast({
         title: "Account Created!",
