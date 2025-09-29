@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Play, SkipForward } from "lucide-react";
+import { SkipForward } from "lucide-react";
 import { WalletContext } from "@/app/dashboard/layout";
 import { initialOrders } from "@/lib/data";
 import type { VideoTask } from "@/lib/types";
@@ -27,8 +27,7 @@ export default function YoutubeViewsTask() {
     const [player, setPlayer] = useState<YouTubePlayer | null>(null);
     const { setWalletBalance } = useContext(WalletContext);
 
-    useEffect(() => {
-        // Load tasks from localStorage
+    const loadTasks = useCallback(() => {
         const savedOrders = localStorage.getItem('adminOrders');
         const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
 
@@ -45,8 +44,26 @@ export default function YoutubeViewsTask() {
         setCurrentTaskIndex(0);
         setIsAllCompleted(false);
         setSessionEarnings(0);
-
+        setTimeLeft(VIDEO_DURATION);
+        setIsPlaying(false);
+        setPlayer(null);
     }, []);
+
+    useEffect(() => {
+        loadTasks();
+
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'adminOrders') {
+                loadTasks();
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, [loadTasks]);
 
     const currentTask = useMemo(() => tasks[currentTaskIndex], [tasks, currentTaskIndex]);
     const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);

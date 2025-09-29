@@ -63,6 +63,12 @@ export default function AdvertiserPage() {
 
         const updatedOrders = [newOrder, ...orders];
         localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+        // Manually dispatch a storage event to notify other components/tabs
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'adminOrders',
+            newValue: JSON.stringify(updatedOrders),
+        }));
+
 
         toast({
             title: "Order Placed!",
