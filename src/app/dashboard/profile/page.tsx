@@ -1,13 +1,13 @@
 
 'use client';
 
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { BadgeIndianRupee, Mail, User, UserPlus, Image as ImageIcon } from "lucide-react";
+import { BadgeIndianRupee, Mail, User, UserPlus, Upload } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { UserContext } from "../layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function ProfilePage() {
     const { toast } = useToast();
     const { user, setUser } = useContext(UserContext);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     
     // Local state for form inputs, initialized from context
     const [name, setName] = useState(user.name);
@@ -33,6 +34,17 @@ export default function ProfilePage() {
             setAvatarUrl(user.avatarUrl || '');
         }
     }, [user]);
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,17 +90,19 @@ export default function ProfilePage() {
                                 <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                             </Avatar>
                              <div className="w-full space-y-2">
-                                <Label htmlFor="avatarUrl">Profile Picture URL</Label>
-                                <div className="relative">
-                                     <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <Input 
-                                        id="avatarUrl" 
-                                        value={avatarUrl} 
-                                        onChange={(e) => setAvatarUrl(e.target.value)} 
-                                        placeholder="https://example.com/image.png" 
-                                        className="pl-10" 
-                                    />
-                                </div>
+                                <Label>Profile Picture</Label>
+                                <Input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
+                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Upload Image
+                                </Button>
+                                <p className="text-xs text-muted-foreground">Select an image from your device.</p>
                             </div>
                         </div>
 
