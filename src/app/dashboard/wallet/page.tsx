@@ -45,7 +45,11 @@ export default function WalletPage() {
     }
 
     const handlePaymentRequest = () => {
-        if (!user) {
+        const loggedInUserId = localStorage.getItem('loggedInUserId');
+        const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        const currentUser = allUsers[loggedInUserId || ''];
+
+        if (!currentUser) {
              toast({
                 title: 'Error',
                 description: 'You must be logged in to make a payment request.',
@@ -69,8 +73,8 @@ export default function WalletPage() {
 
         const newRequest: PaymentRequest = {
             id: transactionId,
-            userId: user.userId, // Use the stable userId
-            userEmail: user.email,
+            userId: currentUser.userId, // Use the stable userId of the logged-in user
+            userEmail: currentUser.email,
             amount,
             status: 'pending',
             date: new Date().toISOString(),
