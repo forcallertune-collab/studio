@@ -23,8 +23,8 @@ export default function YoutubeViewsTask() {
     const [totalEarnings, setTotalEarnings] = useState(0);
     const [player, setPlayer] = useState<YouTubePlayer | null>(null);
 
-    const currentTask = youtubeViewTasks[currentTaskIndex];
-    const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
+    const currentTask = useMemo(() => youtubeViewTasks[currentTaskIndex], [currentTaskIndex]);
+    const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
     
     const videoId = useMemo(() => {
         if (!currentTask) return null;
@@ -45,44 +45,43 @@ export default function YoutubeViewsTask() {
             timer = setInterval(() => {
                 setTimeLeft(prev => prev - 1);
             }, 1000);
-        } else if (timeLeft === 0) {
-            if (isPlaying) { // Only trigger once
-                setIsPlaying(false);
-                setTotalEarnings(prev => prev + currentTask.reward);
-                if (currentTaskIndex < TOTAL_VIDEOS - 1) {
-                    setShowTaskCompletePopup(true);
-                } else {
-                    setIsAllCompleted(true);
-                }
+        } else if (timeLeft <= 0 && isPlaying) {
+             setIsPlaying(false);
+             if (player) {
+                player.pauseVideo();
             }
+             setTotalEarnings(prev => prev + currentTask.reward);
+             if (currentTaskIndex < TOTAL_VIDEOS - 1) {
+                 setShowTaskCompletePopup(true);
+             } else {
+                 setIsAllCompleted(true);
+             }
         }
         return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, currentTaskIndex, currentTask.reward]);
+    }, [isPlaying, timeLeft, currentTaskIndex, currentTask.reward, player]);
     
-    const onPlayerReady = (event: { target: YouTubePlayer }) => {
+    const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
         setPlayer(event.target);
-    };
+    }, []);
 
-    const onPlayerStateChange = (event: { data: number }) => {
-        // Player state codes: 1 for playing, 2 for paused
+    const onPlayerStateChange = useCallback((event: { data: number }) => {
         if (event.data === 1 && timeLeft > 0) { // Playing
             setIsPlaying(true);
-        } else if (event.data === 2) { // Paused
+        } else { // Paused, ended, etc.
             setIsPlaying(false);
         }
-    };
+    }, [timeLeft]);
     
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         setShowTaskCompletePopup(false);
         if (currentTaskIndex < TOTAL_VIDEOS - 1) {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
-            if (player) {
-                player.stopVideo();
-            }
+        } else {
+            setIsAllCompleted(true);
         }
-    };
+    }, [currentTaskIndex]);
 
     const handleRestart = () => {
         setIsAllCompleted(false);
@@ -91,6 +90,14 @@ export default function YoutubeViewsTask() {
         setIsPlaying(false);
         setTotalEarnings(0);
     }
+    
+    useEffect(() => {
+        // Reset player when task changes
+        if (player) {
+            player.stopVideo();
+        }
+    }, [currentTaskIndex, player]);
+
 
     if (!currentTask) {
         return (
