@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import {
   Menu,
   Youtube,
@@ -35,24 +35,35 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { WalletContext } from '@/app/dashboard/layout';
 
-const navItems = [
-    { href: '/dashboard', icon: Home, label: 'Dashboard' },
-    { href: '/dashboard/tasks/youtube', icon: Youtube, label: 'YouTube Tasks' },
-    { href: '/dashboard/tasks/facebook', icon: Facebook, label: 'Facebook Tasks' },
-    { href: '/dashboard/tasks/instagram', icon: Instagram, label: 'Instagram Tasks' },
-    { href: '/dashboard/tasks/google-reviews', icon: Star, label: 'Google Reviews' },
-    { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads' },
-    { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet' },
-    { href: '/dashboard/referrals', icon: Share2, label: 'Referrals & Team' },
-    { href: '/dashboard/advertiser', icon: Rocket, label: 'Advertiser Panel' },
-    { href: '/dashboard/profile', icon: User, label: 'Profile' },
-    { href: '/about', icon: Info, label: 'About Us' },
+const allNavItems = [
+    { href: '/dashboard', icon: Home, label: 'Dashboard', roles: ['earner', 'advertiser', 'both'] },
+    { href: '/dashboard/tasks/youtube', icon: Youtube, label: 'YouTube Tasks', roles: ['earner', 'both'] },
+    { href: '/dashboard/tasks/facebook', icon: Facebook, label: 'Facebook Tasks', roles: ['earner', 'both'] },
+    { href: '/dashboard/tasks/instagram', icon: Instagram, label: 'Instagram Tasks', roles: ['earner', 'both'] },
+    { href: '/dashboard/tasks/google-reviews', icon: Star, label: 'Google Reviews', roles: ['earner', 'both'] },
+    { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads', roles: ['earner', 'both'] },
+    { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet', roles: ['earner', 'advertiser', 'both'] },
+    { href: '/dashboard/referrals', icon: Share2, label: 'Referrals & Team', roles: ['earner', 'both'] },
+    { href: '/dashboard/advertiser', icon: Rocket, label: 'Advertiser Panel', roles: ['advertiser', 'both'] },
+    { href: '/dashboard/profile', icon: User, label: 'Profile', roles: ['earner', 'advertiser', 'both'] },
+    { href: '/about', icon: Info, label: 'About Us', roles: ['earner', 'advertiser', 'both'] },
   ];
 
 export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { walletBalance } = useContext(WalletContext);
+  const [userRole, setUserRole] = React.useState<'earner' | 'advertiser' | 'both' | null>(null);
+
+  React.useEffect(() => {
+    const role = localStorage.getItem('userRole') as 'earner' | 'advertiser' | 'both' | null;
+    setUserRole(role);
+  }, []);
+
+  const navItems = useMemo(() => {
+    if (!userRole) return [];
+    return allNavItems.filter(item => item.roles.includes(userRole));
+  }, [userRole]);
 
   const handleLogout = () => {
     localStorage.clear();

@@ -27,6 +27,7 @@ type SidebarProps = {
 const commonNavItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/dashboard/profile', icon: User, label: 'Profile' },
+  { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet' },
 ];
 
 const earnerNavItems = [
@@ -35,7 +36,6 @@ const earnerNavItems = [
   { href: '/dashboard/tasks/instagram', icon: Instagram, label: 'Instagram Tasks' },
   { href: '/dashboard/tasks/google-reviews', icon: Star, label: 'Google Reviews' },
   { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads' },
-  { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet' },
   { href: '/dashboard/referrals', icon: Share2, label: 'Referrals & Team' },
 ];
 
@@ -52,12 +52,21 @@ export default function DashboardSidebar({ userRole }: SidebarProps) {
   const pathname = usePathname();
 
   let navItems = [...commonNavItems];
-  if (userRole === 'earner' || userRole === 'both') {
+  if (userRole === 'earner') {
     navItems.push(...earnerNavItems);
-  }
-  if (userRole === 'advertiser' || userRole === 'both') {
+  } else if (userRole === 'advertiser') {
     navItems.push(...advertiserNavItems);
+  } else if (userRole === 'both') {
+    navItems.push(...earnerNavItems, ...advertiserNavItems);
   }
+  
+  // Sort dashboard to be first if it's not
+  navItems.sort((a, b) => {
+    if (a.href === '/dashboard') return -1;
+    if (b.href === '/dashboard') return 1;
+    return 0;
+  });
+
 
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
