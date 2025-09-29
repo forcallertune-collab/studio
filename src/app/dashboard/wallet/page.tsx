@@ -20,13 +20,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { WalletContext } from '../layout';
+import { WalletContext, UserContext } from '../layout';
 import placeholderImages from '@/lib/placeholder-images.json';
-import { dummyUser } from '@/lib/data';
 import type { PaymentRequest } from '@/lib/types';
 
 export default function WalletPage() {
-    const { walletBalance, setWalletBalance } = useContext(WalletContext);
+    const { walletBalance } = useContext(WalletContext);
+    const { user } = useContext(UserContext);
     const [rechargeAmount, setRechargeAmount] = useState<number | string>('');
     const [transactionId, setTransactionId] = useState('');
     const { toast } = useToast();
@@ -45,6 +45,15 @@ export default function WalletPage() {
     }
 
     const handlePaymentRequest = () => {
+        if (!user) {
+             toast({
+                title: 'Error',
+                description: 'You must be logged in to make a payment request.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
         const amount = Number(rechargeAmount);
         if (amount <= 0 || !transactionId) {
             toast({
@@ -60,7 +69,8 @@ export default function WalletPage() {
 
         const newRequest: PaymentRequest = {
             id: transactionId,
-            userEmail: dummyUser.email,
+            userId: user.userId, // Use the stable userId
+            userEmail: user.email,
             amount,
             status: 'pending',
             date: new Date().toISOString(),

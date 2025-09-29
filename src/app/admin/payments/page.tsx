@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { PaymentRequest } from '@/lib/types';
+import type { PaymentRequest, User } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
 
@@ -15,7 +15,7 @@ import { Check, X } from 'lucide-react';
 export default function AdminPaymentsPage() {
     const { toast } = useToast();
     const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
-     const [users, setUsers] = useState<any>({});
+    const [users, setUsers] = useState<{[key: string]: User}>({});
 
 
     useEffect(() => {
@@ -27,13 +27,6 @@ export default function AdminPaymentsPage() {
         const savedUsers = localStorage.getItem('users');
          if (savedUsers) {
             setUsers(JSON.parse(savedUsers));
-        } else {
-            // Initialize with dummy user if not present
-            const initialUsers = {
-                'ankit.sharma@example.com': { walletBalance: 1250.75 }
-            };
-            setUsers(initialUsers);
-            localStorage.setItem('users', JSON.stringify(initialUsers));
         }
     }, []);
 
@@ -43,20 +36,29 @@ export default function AdminPaymentsPage() {
                 const newStatus = action === 'approve' ? 'approved' : 'rejected';
                 
                 if (newStatus === 'approved' && req.status === 'pending') {
-                    // Find user and update their balance
-                    const userEmail = req.userEmail;
-                    const updatedUsers = { ...users };
-                    if (updatedUsers[userEmail]) {
-                        updatedUsers[userEmail].walletBalance = (updatedUsers[userEmail].walletBalance || 0) + req.amount;
-                        localStorage.setItem('users', JSON.stringify(updatedUsers));
-                        setUsers(updatedUsers);
+                    // Find user by userId and update their balance
+                    const userId = req.userId;
+                    const allUsers = { ...users };
+                    
+                    if (allUsers[userId]) {
+                        const updatedUser = {
+                            ...allUsers[userId],
+                            walletBalance: (allUsers[userId].walletBalance || 0) + req.amount,
+                        };
+                        allUsers[userId] = updatedUser;
 
-                         // This is a workaround to trigger wallet updates on the user side
-                        localStorage.setItem('walletBalance', updatedUsers[userEmail].walletBalance);
+                        localStorage.setItem('users', JSON.stringify(allUsers));
+                        setUsers(allUsers);
 
                         toast({
                             title: 'Payment Approved',
-                            description: `₹${req.amount.toFixed(2)} added to the user's wallet.`,
+                            description: `₹${req.amount.toFixed(2)} added to the wallet of ${allUsers[userId].name}.`,
+                        });
+                    } else {
+                         toast({
+                            title: 'User not found',
+                            description: `Could not find user to credit payment.`,
+                            variant: 'destructive',
                         });
                     }
                 } else if (newStatus === 'rejected') {

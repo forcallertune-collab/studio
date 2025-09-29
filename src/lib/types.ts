@@ -76,6 +76,7 @@ export type SupportTicket = {
 
 export type PaymentRequest = {
     id: string;
+    userId: string; // Use the stable userId instead of email
     userEmail: string;
     amount: number;
     status: 'pending' | 'approved' | 'rejected';
