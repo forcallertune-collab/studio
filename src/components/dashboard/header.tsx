@@ -14,7 +14,8 @@ import {
   Rocket,
   Info,
   LogOut,
-  BadgeIndianRupee
+  BadgeIndianRupee,
+  Home
 } from 'lucide-react';
 import {
   DropdownMenu,
