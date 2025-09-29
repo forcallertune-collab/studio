@@ -15,31 +15,47 @@ export default function ProfilePage() {
     const { toast } = useToast();
     const { user, setUser } = useContext(UserContext);
     
+    // Local state for form inputs, initialized from context
     const [name, setName] = useState(user.name);
     const [email, setEmail] = useState(user.email);
     const [upiId, setUpiId] = useState(user.upiId || '');
     const [role, setRole] = useState(user.role);
 
+    // Effect to update local state if the user context changes from elsewhere
     useEffect(() => {
-        setName(user.name);
-        setEmail(user.email);
-        setUpiId(user.upiId || '');
-        setRole(user.role);
+        if (user) {
+            setName(user.name);
+            setEmail(user.email);
+            setUpiId(user.upiId || '');
+            setRole(user.role);
+        }
     }, [user]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setUser({
-            ...user,
-            name,
-            email,
-            upiId,
-            role
-        });
+        
+        // Update the central context. This will trigger the save effect in layout.tsx.
+        if (setUser) {
+             setUser(prevUser => {
+                if (!prevUser) return null;
+                return {
+                    ...prevUser,
+                    name,
+                    email,
+                    upiId,
+                    role
+                }
+            });
+        }
+
         toast({
             title: "Profile Updated",
             description: "Your information has been saved successfully.",
         });
+    }
+
+    if (!user) {
+        return null; // or a loading spinner
     }
 
     return (

@@ -21,7 +21,7 @@ export const WalletContext = createContext<WalletContextType>({
 
 type UserContextType = {
   user: User;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 export const UserContext = createContext<UserContextType>({
@@ -59,10 +59,6 @@ export default function DashboardLayout({
       setShowWelcome(true);
     }
     
-    // Initialize data in localStorage if it's not there
-    if (localStorage.getItem('walletBalance') === null && currentUser) {
-      localStorage.setItem('walletBalance', String(currentUser.walletBalance));
-    }
   }, []);
 
   useEffect(() => {
@@ -70,6 +66,15 @@ export default function DashboardLayout({
     if (user) {
         localStorage.setItem('walletBalance', String(walletBalance));
         const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        
+        // Use the original email to find the user in case it's being changed.
+        const loggedInUserEmail = localStorage.getItem('loggedInUser');
+        if (loggedInUserEmail && loggedInUserEmail !== user.email) {
+             // If email is changed, delete old entry
+            delete allUsers[loggedInUserEmail];
+            localStorage.setItem('loggedInUser', user.email);
+        }
+
         allUsers[user.email] = { ...user, walletBalance };
         localStorage.setItem('users', JSON.stringify(allUsers));
 
@@ -90,7 +95,7 @@ export default function DashboardLayout({
     setWalletBalance
   }), [walletBalance]);
 
-  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user, setUser]);
+  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user]);
 
 
   if (!user || !user.role) {
