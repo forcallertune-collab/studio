@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { LifeBuoy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { dummyTickets } from '@/lib/data';
+import { initialSupportTickets } from '@/lib/data';
 import type { SupportTicket } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -19,10 +19,10 @@ export default function SupportPage() {
     const { toast } = useToast();
     const [tickets, setTickets] = useState<SupportTicket[]>(() => {
         if (typeof window === 'undefined') {
-            return dummyTickets;
+            return initialSupportTickets;
         }
         const savedTickets = localStorage.getItem('supportTickets');
-        return savedTickets ? JSON.parse(savedTickets) : dummyTickets;
+        return savedTickets ? JSON.parse(savedTickets) : initialSupportTickets;
     });
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');

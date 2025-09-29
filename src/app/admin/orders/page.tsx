@@ -7,16 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { initialOrders } from '@/lib/data';
 
 type OrderStatus = 'completed' | 'processing' | 'pending' | 'failed' | 'cancelled' | 'in progress';
 
-const initialOrders = [
-  { id: 'ORD-001', user: 'Amit Patel', service: 'YouTube Subscribers', amount: 1200, status: 'completed' as OrderStatus, date: '2024-07-29' },
-  { id: 'ORD-002', user: 'Priya Singh', service: 'Facebook Page Likes', amount: 400, status: 'in progress' as OrderStatus, date: '2024-07-29' },
-  { id: 'ORD-003', user: 'Rohan Gupta', service: 'Instagram Followers', amount: 900, status: 'completed' as OrderStatus, date: '2024-07-28' },
-  { id: 'ORD-004', user: 'Sneha Reddy', service: 'YouTube Views', amount: 240, status: 'pending' as OrderStatus, date: '2024-07-28' },
-  { id: 'ORD-005', user: 'Vikram Kumar', service: 'YouTube Watch Time', amount: 2000, status: 'cancelled' as OrderStatus, date: '2024-07-27' },
-];
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState(() => {
@@ -59,7 +53,7 @@ export default function AdminOrdersPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.map(order => (
+                        {orders.map((order: any) => (
                             <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.id}</TableCell>
                                 <TableCell>{order.user}</TableCell>

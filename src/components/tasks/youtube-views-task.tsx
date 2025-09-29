@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import YouTube from 'react-youtube';
 import type { YouTubePlayer } from 'react-youtube';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,13 @@ export default function YoutubeViewsTask() {
     const currentTask = youtubeViewTasks[currentTaskIndex];
     const progress = ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100;
     
-    const videoId = new URL(currentTask.url).searchParams.get('v');
+    const videoId = useMemo(() => {
+        try {
+            return new URL(currentTask.url).searchParams.get('v');
+        } catch (e) {
+            return null;
+        }
+    }, [currentTask.url]);
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -67,6 +73,11 @@ export default function YoutubeViewsTask() {
             setCurrentTaskIndex(prev => prev + 1);
             setTimeLeft(VIDEO_DURATION);
             setIsPlaying(false);
+            if (player) {
+                // The key prop on YouTube component will handle re-mounting
+                // but we can also explicitly stop the video.
+                player.stopVideo();
+            }
         }
     };
 
@@ -87,6 +98,7 @@ export default function YoutubeViewsTask() {
             <CardContent>
                 <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
                    <YouTube
+                        key={currentTaskIndex} // Add key to force re-render
                         videoId={videoId || ''}
                         opts={{
                             height: '100%',
