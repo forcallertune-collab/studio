@@ -16,7 +16,8 @@ import {
   Rocket,
   Info,
   LifeBuoy,
-  Shield
+  Shield,
+  Video
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Logo from '../logo';
@@ -38,7 +39,7 @@ const earnerNavItems = [
   { href: '/dashboard/tasks/instagram', icon: Instagram, label: 'Instagram Tasks' },
   { href: '/dashboard/tasks/google-reviews', icon: Star, label: 'Google Reviews' },
   { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads' },
-  { href: '/dashboard/referrals', icon: Share2, label: 'Referrals & Team' },
+  { href: '/dashboard/meeting', icon: Video, label: 'Meeting' },
 ];
 
 const advertiserNavItems = [
@@ -60,6 +61,7 @@ export default function DashboardSidebar({ userRole }: SidebarProps) {
     navItems.push(...earnerNavItems);
   } else if (userRole === 'advertiser') {
     navItems.push(...advertiserNavItems);
+     navItems.push({ href: '/dashboard/meeting', icon: Video, label: 'Meeting' });
   } else if (userRole === 'both') {
     navItems.push(...earnerNavItems, ...advertiserNavItems);
   }
@@ -70,6 +72,13 @@ export default function DashboardSidebar({ userRole }: SidebarProps) {
     if (b.href === '/dashboard') return 1;
     return 0;
   });
+
+  // Remove duplicates
+  navItems = navItems.filter((item, index, self) =>
+    index === self.findIndex((t) => (
+      t.href === item.href
+    ))
+  )
 
 
   return (
