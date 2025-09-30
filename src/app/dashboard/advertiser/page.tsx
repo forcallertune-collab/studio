@@ -57,7 +57,7 @@ export default function AdvertiserPage() {
             link: link, // Save the link
             quantity: Number(quantity), // Save the quantity
             amount: totalCost,
-            status: 'pending' as const,
+            status: 'in progress' as const, // Set status to 'in progress'
             date: new Date().toISOString().split('T')[0],
         };
 
@@ -72,7 +72,7 @@ export default function AdvertiserPage() {
 
         toast({
             title: "Order Placed!",
-            description: `₹${totalCost.toFixed(2)} has been deducted. Your order is pending admin approval.`,
+            description: `₹${totalCost.toFixed(2)} has been deducted. Your campaign is now live.`,
         });
         
         // Reset form
