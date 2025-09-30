@@ -26,10 +26,10 @@ export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
   const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && user?.referralCode) {
         setReferralLink(`${window.location.origin}/?ref=${user.referralCode}`);
     }
-  }, [isOpen, user.referralCode]);
+  }, [isOpen, user?.referralCode]);
 
   const copyReferralLink = () => {
     if (!referralLink) return;
@@ -39,6 +39,10 @@ export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
       description: 'Your referral link is ready to be shared.',
     });
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,8 +57,8 @@ export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 text-center bg-secondary/50 rounded-lg">
-          <p className="text-sm text-muted-foreground">Share your referral link to earn</p>
-          <p className="text-2xl font-bold text-accent-foreground">₹25 for each new member!</p>
+          <p className="text-sm text-muted-foreground">Share your referral link to earn commissions</p>
+          <p className="text-xl font-bold text-accent-foreground">from your team's earnings!</p>
         </div>
         <div className="mt-2 flex items-center space-x-2">
           <div className="grid flex-1 gap-2">

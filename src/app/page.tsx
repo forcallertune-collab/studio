@@ -75,7 +75,7 @@ export default function Home() {
         password: signupPassword, // In a real app, this should be hashed
         role: role,
         referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
-        walletBalance: 25.00, // Welcome bonus
+        walletBalance: 0.00, // No Welcome bonus
     };
 
     users[userId] = newUser; // Use userId as the key
@@ -86,7 +86,7 @@ export default function Home() {
     
     toast({
         title: "Account Created!",
-        description: "Welcome! We've added a bonus of ₹25.00 to your wallet."
+        description: "Welcome to WeTube!"
     });
     router.push('/dashboard');
   };
@@ -133,7 +133,7 @@ export default function Home() {
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
-                <CardDescription>Join us and get a welcome bonus!</CardDescription>
+                <CardDescription>Join us to start your journey.</CardDescription>
               </CardHeader>
               <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">

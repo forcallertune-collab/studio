@@ -9,7 +9,7 @@ export const dummyUser: User = {
   password: 'password123',
   role: 'both',
   referralCode: 'ANKIT2024',
-  walletBalance: 25.00,
+  walletBalance: 0.00,
   upiId: 'ankit.sharma@upi',
   avatarUrl: `https://i.pravatar.cc/150?u=ankit.sharma@example.com`,
 };
@@ -54,3 +54,4 @@ export const referralChartData = [
 export const initialSupportTickets: SupportTicket[] = [];
 
 export const initialOrders = [];
+
