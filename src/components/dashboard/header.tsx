@@ -61,14 +61,18 @@ export default function DashboardHeader() {
   const { user } = useContext(UserContext);
 
   const navItems = useMemo(() => {
-    if (!user.role) return [];
+    if (!user || !user.role) return [];
     return allNavItems.filter(item => item.roles.includes(user.role));
-  }, [user.role]);
+  }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem('loggedInUserId');
     router.push('/');
   };
+
+  if (!user) {
+    return null; // Or a loading skeleton
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">

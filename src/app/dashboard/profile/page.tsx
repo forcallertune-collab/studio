@@ -20,11 +20,11 @@ export default function ProfilePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     // Local state for form inputs, initialized from context
-    const [name, setName] = useState(user.name);
-    const [email, setEmail] = useState(user.email);
-    const [upiId, setUpiId] = useState(user.upiId || '');
-    const [role, setRole] = useState(user.role);
-    const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
+    const [name, setName] = useState(user?.name || '');
+    const [email, setEmail] = useState(user?.email || '');
+    const [upiId, setUpiId] = useState(user?.upiId || '');
+    const [role, setRole] = useState(user?.role || 'earner');
+    const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
 
     // Effect to update local state if the user context changes from elsewhere
     useEffect(() => {
@@ -52,7 +52,7 @@ export default function ProfilePage() {
         e.preventDefault();
         
         // Update the central context. This will trigger the save effect in layout.tsx.
-        if (setUser) {
+        if (setUser && user) {
              setUser(prevUser => {
                 if (!prevUser) return null;
                 return {
@@ -91,7 +91,7 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-6">
                             <Avatar className="h-24 w-24">
                                 <AvatarImage src={avatarUrl} alt={name} />
-                                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                                <AvatarFallback>{name ? name.charAt(0) : ''}</AvatarFallback>
                             </Avatar>
                              <div className="w-full space-y-2">
                                 <Label>Profile Picture</Label>

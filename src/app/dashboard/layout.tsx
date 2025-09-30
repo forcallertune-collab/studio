@@ -20,12 +20,12 @@ export const WalletContext = createContext<WalletContextType>({
 });
 
 type UserContextType = {
-  user: User;
+  user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 export const UserContext = createContext<UserContextType>({
-    user: dummyUser,
+    user: null,
     setUser: () => {},
 });
 
@@ -49,9 +49,11 @@ export default function DashboardLayout({
         setUser(currentUser);
         setWalletBalance(currentUser.walletBalance || 0);
     } else {
-        // Fallback to dummy user if something is wrong
-        setUser(dummyUser);
-        setWalletBalance(dummyUser.walletBalance);
+        // Fallback to a cleared state or redirect to login if no user is found
+        setUser(null);
+        setWalletBalance(0);
+        // Consider redirecting to login page if no logged-in user
+        // For this example, we'll allow a null user state
     }
   };
 
@@ -86,7 +88,9 @@ export default function DashboardLayout({
         const loggedInUserId = localStorage.getItem('loggedInUserId');
         
         if (loggedInUserId && allUsers[loggedInUserId]) {
-            allUsers[loggedInUserId] = { ...user, walletBalance };
+            // Create an updated user object with the new balance
+            const updatedUser = { ...user, walletBalance };
+            allUsers[loggedInUserId] = updatedUser;
             localStorage.setItem('users', JSON.stringify(allUsers));
         }
 
@@ -107,10 +111,10 @@ export default function DashboardLayout({
     setWalletBalance
   }), [walletBalance]);
 
-  const userContextValue = useMemo(() => ({ user: user!, setUser }), [user]);
+  const userContextValue = useMemo(() => ({ user, setUser }), [user]);
 
 
-  if (!user || !user.role) {
+  if (!user) {
     // Or a loading spinner
     return null;
   }
@@ -126,10 +130,12 @@ export default function DashboardLayout({
                 {children}
               </main>
             </div>
-            <WelcomeDialog
-              isOpen={showWelcome}
-              onClose={handleCloseWelcome}
-            />
+            {user && ( // Only show welcome dialog if user is loaded
+                <WelcomeDialog
+                isOpen={showWelcome}
+                onClose={handleCloseWelcome}
+                />
+            )}
           </div>
         </WalletContext.Provider>
     </UserContext.Provider>
