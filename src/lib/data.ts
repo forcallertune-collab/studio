@@ -54,14 +54,14 @@ export const referralChartData = [
 export const initialSupportTickets: SupportTicket[] = [];
 
 export const initialOrders = [
-    {
-        id: 'ORD-001',
-        user: 'Advertiser One',
-        service: 'YouTube Views',
-        link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        quantity: 10000,
-        amount: 1200.00,
-        status: 'in progress' as const,
-        date: '2024-07-29',
-    }
+    { id: 'ORD-001', user: 'Advertiser One', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', quantity: 10000, amount: 1200.00, status: 'in progress' as const, date: '2024-07-29'},
+    { id: 'ORD-002', user: 'Advertiser Two', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=3JZ_D3p3Q2Q', quantity: 5000, amount: 600.00, status: 'in progress' as const, date: '2024-07-28'},
+    { id: 'ORD-003', user: 'Advertiser Three', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=9bZkp7q19f0', quantity: 20000, amount: 2400.00, status: 'in progress' as const, date: '2024-07-27'},
+    { id: 'ORD-004', user: 'Advertiser Four', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=Y-x0efG1seA', quantity: 15000, amount: 1800.00, status: 'in progress' as const, date: '2024-07-26'},
+    { id: 'ORD-005', user: 'Advertiser Five', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk', quantity: 50000, amount: 6000.00, status: 'in progress' as const, date: '2024-07-25'},
+    { id: 'ORD-006', user: 'Advertiser Six', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=C0DPdy98e4c', quantity: 2000, amount: 240.00, status: 'in progress' as const, date: '2024-07-24'},
+    { id: 'ORD-007', user: 'Advertiser Seven', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=pXRviuL6vMY', quantity: 8000, amount: 960.00, status: 'in progress' as const, date: '2024-07-23'},
+    { id: 'ORD-008', user: 'Advertiser Eight', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=taken_yv-2g', quantity: 12000, amount: 1440.00, status: 'in progress' as const, date: '2024-07-22'},
+    { id: 'ORD-009', user: 'Advertiser Nine', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=0-7IHOXkiV8', quantity: 3000, amount: 360.00, status: 'in progress' as const, date: '2024-07-21'},
+    { id: 'ORD-010', user: 'Advertiser Ten', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=ru0K8uYEbDE', quantity: 1000, amount: 120.00, status: 'in progress' as const, date: '2024-07-20'},
 ];

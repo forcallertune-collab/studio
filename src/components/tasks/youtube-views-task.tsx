@@ -1,31 +1,132 @@
 
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback, useMemo, useContext } from "react";
+import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
+import Image from 'next/image';
 import YouTube from 'react-youtube';
 import type { YouTubePlayer } from 'react-youtube';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { SkipForward } from "lucide-react";
-import { WalletContext } from "@/app/dashboard/layout";
-import { initialOrders } from "@/lib/data";
-import type { VideoTask } from "@/lib/types";
-
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { CheckCircle } from 'lucide-react';
+import { WalletContext } from '@/app/dashboard/layout';
+import { initialOrders } from '@/lib/data';
+import type { VideoTask } from '@/lib/types';
 
 const VIDEO_DURATION = 30; // seconds
 
-export default function YoutubeViewsTask() {
-    const [tasks, setTasks] = useState<VideoTask[]>([]);
-    const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+const getYouTubeVideoId = (url: string) => {
+    try {
+        const urlObj = new URL(url);
+        if (urlObj.hostname === 'youtu.be') {
+            return urlObj.pathname.slice(1);
+        }
+        return urlObj.searchParams.get('v');
+    } catch (e) {
+        return null;
+    }
+};
+
+const VideoPlayerDialog = ({ task, onComplete, children }: { task: VideoTask; onComplete: () => void; children: React.ReactNode }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [player, setPlayer] = useState<YouTubePlayer | null>(null);
     const [timeLeft, setTimeLeft] = useState(VIDEO_DURATION);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isAllCompleted, setIsAllCompleted] = useState(false);
-    const [showTaskCompletePopup, setShowTaskCompletePopup] = useState(false);
-    const [sessionEarnings, setSessionEarnings] = useState(0);
-    const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+    const [isCompleted, setIsCompleted] = useState(false);
     const { setWalletBalance } = useContext(WalletContext);
+
+    const videoId = useMemo(() => getYouTubeVideoId(task.url), [task.url]);
+    const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isPlaying && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => Math.max(0, prev - 1));
+            }, 1000);
+        } else if (timeLeft <= 0 && isPlaying) {
+            setIsPlaying(false);
+            if (player) {
+                player.pauseVideo();
+            }
+            if (!isCompleted) {
+                setWalletBalance(prev => prev + task.reward);
+                setIsCompleted(true);
+                onComplete();
+            }
+        }
+        return () => clearInterval(timer);
+    }, [isPlaying, timeLeft, player, task.reward, setWalletBalance, isCompleted, onComplete]);
+
+    const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
+        setPlayer(event.target);
+    }, []);
+
+    const onPlayerStateChange = useCallback((event: { data: number }) => {
+        if (!event.target?.getPlayerState) return;
+        
+        // When video starts playing
+        if (event.data === 1 && timeLeft > 0) { 
+            setIsPlaying(true);
+        } else { // When paused, ended, etc.
+            setIsPlaying(false);
+        }
+    }, [timeLeft]);
+    
+    const handleClose = () => {
+        setIsOpen(false);
+        // Reset state when closing dialog
+        setTimeLeft(VIDEO_DURATION);
+        setIsPlaying(false);
+        setPlayer(null);
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                    <DialogTitle>{task.title}</DialogTitle>
+                </DialogHeader>
+                <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
+                    {videoId ? (
+                        <YouTube
+                            videoId={videoId}
+                            opts={{ height: '100%', width: '100%', playerVars: { autoplay: 0, controls: 1 } }}
+                            onReady={onPlayerReady}
+                            onStateChange={onPlayerStateChange}
+                            className="w-full h-full"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white">Could not load video.</div>
+                    )}
+                </div>
+                <div className="mt-4 space-y-2">
+                    <Progress value={progress} />
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <span>Time left: {timeLeft}s</span>
+                        {isCompleted && (
+                            <span className="flex items-center gap-1 text-green-600 font-semibold">
+                                <CheckCircle className="h-4 w-4" /> Completed (+₹{task.reward.toFixed(2)})
+                            </span>
+                        )}
+                    </div>
+                </div>
+                 <DialogFooter>
+                    <Button onClick={handleClose} variant="secondary">Close</Button>
+                </DialogFooter>
+            </DialogContent>
+            <div onClick={() => setIsOpen(true)}>
+                {children}
+            </div>
+        </Dialog>
+    );
+};
+
+
+export default function YoutubeViewsTask() {
+    const [tasks, setTasks] = useState<VideoTask[]>([]);
+    const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
 
     const loadTasks = useCallback(() => {
         const savedOrders = localStorage.getItem('adminOrders');
@@ -33,111 +134,25 @@ export default function YoutubeViewsTask() {
 
         const viewTasks: VideoTask[] = orders
             .filter((order: any) => order.service === 'YouTube Views' && order.status === 'in progress')
-            .map((order: any, index: number) => ({
-                id: `view-task-${order.id}-${index}`,
+            .map((order: any) => ({
+                id: order.id, // Use order ID as unique task ID
                 title: `Watch video from ${order.user}`,
                 url: order.link,
-                reward: 0.75, // Standard reward
+                reward: 0.75,
             }));
         
         setTasks(viewTasks);
-        setCurrentTaskIndex(0);
-        setIsAllCompleted(false);
-        setSessionEarnings(0);
-        setTimeLeft(VIDEO_DURATION);
-        setIsPlaying(false);
-        setPlayer(null);
     }, []);
 
     useEffect(() => {
         loadTasks();
-
-        const handleStorageChange = (e: StorageEvent) => {
-            if (e.key === 'adminOrders') {
-                loadTasks();
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
+        window.addEventListener('storage', loadTasks);
+        return () => window.removeEventListener('storage', loadTasks);
     }, [loadTasks]);
 
-    const currentTask = useMemo(() => tasks[currentTaskIndex], [tasks, currentTaskIndex]);
-    const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
-    
-    const videoId = useMemo(() => {
-        if (!currentTask) return null;
-        try {
-            const url = new URL(currentTask.url);
-            if (url.hostname === 'youtu.be') {
-                return url.pathname.slice(1);
-            }
-            return url.searchParams.get('v');
-        } catch (e) {
-            return null;
-        }
-    }, [currentTask]);
-
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (isPlaying && timeLeft > 0) {
-            timer = setInterval(() => {
-                setTimeLeft(prev => prev - 1);
-            }, 1000);
-        } else if (timeLeft <= 0 && isPlaying) {
-             setIsPlaying(false);
-             if (player) {
-                player.pauseVideo();
-            }
-             setSessionEarnings(prev => prev + currentTask.reward);
-             setWalletBalance(prev => prev + currentTask.reward);
-             if (currentTaskIndex < tasks.length - 1) {
-                 setShowTaskCompletePopup(true);
-             } else {
-                 setIsAllCompleted(true);
-             }
-        }
-        return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, currentTaskIndex, currentTask, player, setWalletBalance, tasks.length]);
-    
-    const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
-        setPlayer(event.target);
-    }, []);
-
-    const onPlayerStateChange = useCallback((event: { data: number }) => {
-        // HACK: Sometimes onStateChange is called with a null target.
-        if (!event.target?.getPlayerState) {
-            return;
-        }
-        if (event.data === 1 && timeLeft > 0) { // Playing
-            setIsPlaying(true);
-        } else { // Paused, ended, etc.
-            setIsPlaying(false);
-        }
-    }, [timeLeft]);
-    
-    const handleNext = useCallback(() => {
-        setShowTaskCompletePopup(false);
-        if (currentTaskIndex < tasks.length - 1) {
-            setCurrentTaskIndex(prev => prev + 1);
-            setTimeLeft(VIDEO_DURATION);
-            setIsPlaying(false);
-            setPlayer(null); // Force re-render of YouTube component
-        } else {
-            setIsAllCompleted(true);
-        }
-    }, [currentTaskIndex, tasks.length]);
-
-    const handleRestart = () => {
-        setIsAllCompleted(false);
-        setCurrentTaskIndex(0);
-        setTimeLeft(VIDEO_DURATION);
-        setIsPlaying(false);
-        setSessionEarnings(0);
-    }
+    const handleTaskComplete = (taskId: string) => {
+        setCompletedTasks(prev => new Set(prev).add(taskId));
+    };
 
     if (tasks.length === 0) {
         return (
@@ -152,94 +167,50 @@ export default function YoutubeViewsTask() {
                     </div>
                 </CardContent>
             </Card>
-        )
-    }
-
-    if (!currentTask) {
-        return (
-             <Card>
-                <CardHeader>
-                    <CardTitle>Loading...</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>Loading video tasks...</p>
-                </CardContent>
-            </Card>
-        )
+        );
     }
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Watch Videos & Earn</CardTitle>
-                <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Complete all available tasks to maximize your earnings.</CardDescription>
+                <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Click on any video below to start.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative flex items-center justify-center">
-                   {videoId ? (
-                    <YouTube
-                        key={currentTaskIndex} // Add key to force re-render
-                        videoId={videoId}
-                        opts={{
-                            height: '100%',
-                            width: '100%',
-                            playerVars: {
-                                autoplay: 0,
-                                controls: 1,
-                            },
-                        }}
-                        onReady={onPlayerReady}
-                        onStateChange={onPlayerStateChange}
-                        className="w-full h-full"
-                    />
-                   ) : (
-                    <p>Could not load video.</p>
-                   )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {tasks.map(task => {
+                        const videoId = getYouTubeVideoId(task.url);
+                        const isCompleted = completedTasks.has(task.id);
+                        return (
+                            <VideoPlayerDialog key={task.id} task={task} onComplete={() => handleTaskComplete(task.id)}>
+                                <Card className="overflow-hidden cursor-pointer group hover:border-primary transition-all">
+                                    <div className="relative aspect-video">
+                                        {videoId ? (
+                                            <Image 
+                                                src={`https://img.youtube.com/vi/${videoId}/mqdefault.jpg`} 
+                                                alt={task.title} 
+                                                fill
+                                                className="object-cover transition-transform group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-muted flex items-center justify-center text-xs text-muted-foreground">No preview</div>
+                                        )}
+                                        {isCompleted && (
+                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                <CheckCircle className="h-10 w-10 text-green-500" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3">
+                                        <p className="text-sm font-semibold truncate group-hover:text-primary">{task.title}</p>
+                                        <p className="text-xs text-primary font-bold">+ ₹{task.reward.toFixed(2)}</p>
+                                    </div>
+                                </Card>
+                            </VideoPlayerDialog>
+                        );
+                    })}
                 </div>
-                <div className="mt-4 space-y-2">
-                    <h3 className="font-semibold">{currentTask.title}</h3>
-                    <Progress value={progress} />
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                        <span>Time left: {timeLeft}s</span>
-                        <span>Task: {currentTaskIndex + 1} / {tasks.length}</span>
-                        <span>Session Earnings: ₹{sessionEarnings.toFixed(2)}</span>
-                    </div>
-                </div>
-                 <div className="mt-4">
-                    <Button onClick={handleNext} disabled={timeLeft > 0 || currentTaskIndex >= tasks.length - 1}>
-                        Next Video <SkipForward className="ml-2 h-4 w-4" />
-                    </Button>
-                 </div>
             </CardContent>
-
-             <AlertDialog open={showTaskCompletePopup} onOpenChange={setShowTaskCompletePopup}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle className="font-headline">Task Complete!</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        You've earned ₹{currentTask.reward.toFixed(2)}. This has been added to your main wallet.
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogAction onClick={handleNext}>Next Video</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
-             <AlertDialog open={isAllCompleted}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle className="font-headline">All Tasks Complete!</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Congratulations! You've earned a total of ₹{sessionEarnings.toFixed(2)} in this session. 
-                        Come back tomorrow for more videos.
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogAction onClick={handleRestart}>Start Over (Demo)</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </Card>
-    )
+    );
 }
