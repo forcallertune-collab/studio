@@ -17,7 +17,6 @@ import {
   Info,
   LifeBuoy,
   Shield,
-  Video
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Logo from '../logo';
@@ -39,7 +38,6 @@ const earnerNavItems = [
   { href: '/dashboard/tasks/instagram', icon: Instagram, label: 'Instagram Tasks' },
   { href: '/dashboard/tasks/google-reviews', icon: Star, label: 'Google Reviews' },
   { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads' },
-  { href: '/dashboard/meeting', icon: Video, label: 'Meeting' },
 ];
 
 const advertiserNavItems = [
@@ -61,7 +59,6 @@ export default function DashboardSidebar({ userRole }: SidebarProps) {
     navItems.push(...earnerNavItems);
   } else if (userRole === 'advertiser') {
     navItems.push(...advertiserNavItems);
-     navItems.push({ href: '/dashboard/meeting', icon: Video, label: 'Meeting' });
   } else if (userRole === 'both') {
     navItems.push(...earnerNavItems, ...advertiserNavItems);
   }
