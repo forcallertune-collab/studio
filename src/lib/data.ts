@@ -14,47 +14,15 @@ export const dummyUser: User = {
   avatarUrl: `https://i.pravatar.cc/150?u=ankit.sharma@example.com`,
 };
 
-export const youtubeSubscribeTasks: SubscriptionTask[] = Array.from({ length: 100 }, (_, i) => ({
-  id: `sub-${i + 1}`,
-  channelName: `Awesome Creator ${i + 1}`,
-  url: `https://www.youtube.com/channel/example${i}`,
-  reward: 1.0,
-}));
+export const youtubeSubscribeTasks: SubscriptionTask[] = [];
 
-export const youtubeLikeTasks: LikeTask[] = Array.from({ length: 100 }, (_, i) => ({
-  id: `like-${i + 1}`,
-  videoTitle: `Cool Video Clip ${i + 1}`,
-  url: `https://www.youtube.com/watch?v=like_example${i}`,
-  reward: 0.5,
-}));
+export const youtubeLikeTasks: LikeTask[] = [];
 
-export const youtubeCommentTasks: CommentTask[] = Array.from({ length: 100 }, (_, i) => ({
-  id: `comment-${i + 1}`,
-  videoTitle: `Viral Moment ${i + 1}`,
-  url: `https://www.youtube.com/watch?v=comment_example${i}`,
-  reward: 0.5,
-  templates: [
-    "Wow, this is amazing!",
-    "Great content, keep it up!",
-    "I learned so much from this.",
-    "This is so helpful, thank you!",
-    "Can't wait for the next video!"
-  ]
-}));
+export const youtubeCommentTasks: CommentTask[] = [];
 
-export const facebookLikeTasks: FacebookLikeTask[] = Array.from({ length: 20 }, (_, i) => ({
-    id: `fb-like-${i + 1}`,
-    pageName: `Facebook Page ${i + 1}`,
-    url: `https://www.facebook.com/example${i}`,
-    reward: 0.5,
-}));
+export const facebookLikeTasks: FacebookLikeTask[] = [];
 
-export const facebookFollowTasks: FacebookFollowTask[] = Array.from({ length: 20 }, (_, i) => ({
-    id: `fb-follow-${i + 1}`,
-    pageName: `Influencer Profile ${i + 1}`,
-    url: `https://www.facebook.com/example_follow${i}`,
-    reward: 1.0,
-}));
+export const facebookFollowTasks: FacebookFollowTask[] = [];
 
 export const advertiserServices: AdvertiserService[] = [
   // YouTube
