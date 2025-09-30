@@ -23,17 +23,6 @@ export default function DashboardPage() {
   const [taskCount, setTaskCount] = useState(0);
   const [referralEarnings, setReferralEarnings] = useState(0);
 
-  useEffect(() => {
-    // These would be fetched from a real backend.
-    // Simulating dynamic data loading.
-    const timer = setTimeout(() => {
-        setTaskCount(Math.floor(Math.random() * 50));
-        setReferralEarnings(Math.random() * 500);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-
   return (
     <div className="grid gap-6">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
