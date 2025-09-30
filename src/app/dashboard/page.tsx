@@ -90,30 +90,6 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
-      
-      <Card>
-        <CardHeader>
-            <CardTitle className="font-headline">How to Earn More</CardTitle>
-            <CardDescription>Follow these steps to maximize your income on WeTube.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid md:grid-cols-3 gap-6 text-center">
-            <div className="flex flex-col items-center">
-                <Image src={placeholderImages.placeholderImages[0].imageUrl} alt="Watch Videos" width={150} height={150} className="rounded-full mb-4 border-4 border-primary/20" data-ai-hint={placeholderImages.placeholderImages[0].imageHint} />
-                <h3 className="font-semibold mb-1">1. Complete Daily Tasks</h3>
-                <p className="text-sm text-muted-foreground">Watch videos, like, subscribe and comment daily to earn a steady income.</p>
-            </div>
-            <div className="flex flex-col items-center">
-                 <Image src={placeholderImages.placeholderImages[1].imageUrl} alt="Build Your Team" width={150} height={150} className="rounded-full mb-4 border-4 border-primary/20" data-ai-hint={placeholderImages.placeholderImages[1].imageHint} />
-                <h3 className="font-semibold mb-1">2. Build Your Team</h3>
-                <p className="text-sm text-muted-foreground">Invite friends using your referral code and earn 10% of their income for life.</p>
-            </div>
-            <div className="flex flex-col items-center">
-                <Image src={placeholderImages.placeholderImages[2].imageUrl} alt="Promote Services" width={150} height={150} className="rounded-full mb-4 border-4 border-primary/20" data-ai-hint={placeholderImages.placeholderImages[2].imageHint} />
-                <h3 className="font-semibold mb-1">3. Become an Advertiser</h3>
-                <p className="text-sm text-muted-foreground">Promote your own content or business to our active community of earners.</p>
-            </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
