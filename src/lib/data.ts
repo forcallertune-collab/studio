@@ -20,9 +20,29 @@ export const youtubeLikeTasks: LikeTask[] = [];
 
 export const youtubeCommentTasks: CommentTask[] = [];
 
-export const facebookLikeTasks: FacebookLikeTask[] = [];
+export const facebookLikeTasks: FacebookLikeTask[] = [
+  { id: 'fbl-1', pageName: 'Creative Minds', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-2', pageName: 'Tech Updates', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-3', pageName: 'Gamer\'s Hub', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-4', pageName: 'Foodies Corner', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-5', pageName: 'Travel Escapes', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-6', pageName: 'Fitness World', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-7', pageName: 'Startup Stories', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-8', pageName: 'Movie Buffs', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+  { id: 'fbl-9', pageName: 'Music Lovers', url: 'https://www.facebook.com/facebook', reward: 0.50 },
+];
 
-export const facebookFollowTasks: FacebookFollowTask[] = [];
+export const facebookFollowTasks: FacebookFollowTask[] = [
+  { id: 'fbf-1', pageName: 'Digital Creator', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-2', pageName: 'Influencer Insights', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-3', pageName: 'Public Figure Official', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-4', pageName: 'Tech Guru', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-5', pageName: 'Artist\'s Profile', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-6', pageName: 'Entrepreneur Talks', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-7', pageName: 'Comedy King', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-8', pageName: 'Fashion Icon', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+  { id: 'fbf-9', pageName: 'Health & Wellness Coach', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+];
 
 export const advertiserServices: AdvertiserService[] = [
   // YouTube
