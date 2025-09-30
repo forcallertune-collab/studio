@@ -9,7 +9,7 @@ export const dummyUser: User = {
   password: 'password123',
   role: 'both',
   referralCode: 'ANKIT2024',
-  walletBalance: 1250.75,
+  walletBalance: 25.00,
   upiId: 'ankit.sharma@upi',
   avatarUrl: `https://i.pravatar.cc/150?u=ankit.sharma@example.com`,
 };
@@ -83,17 +83,6 @@ export const referralChartData = [
   { referrals: 70, earnings: 1050 },
 ];
 
-export const initialSupportTickets: SupportTicket[] = [
-    { id: 'TICKET-7A5B1C', subject: 'Withdrawal not processed', status: 'open', lastUpdated: '2024-07-28' },
-    { id: 'TICKET-9D3E8F', subject: 'Referral bonus not credited', status: 'open', lastUpdated: '2024-07-27' },
-    { id: 'TICKET-4G2H6I', subject: 'Account login issue', status: 'closed', lastUpdated: '2024-07-25' },
-];
+export const initialSupportTickets: SupportTicket[] = [];
 
-export const initialOrders = [
-  { id: 'ORD-001', user: 'Amit Patel', service: 'YouTube Subscribers', amount: 1200, status: 'completed' as const, date: '2024-07-29', link: 'https://youtube.com/example', quantity: 1000 },
-  { id: 'ORD-002', user: 'Priya Singh', service: 'Facebook Page Likes', amount: 400, status: 'in progress' as const, date: '2024-07-29', link: 'https://facebook.com/example', quantity: 500 },
-  { id: 'ORD-003', user: 'Rohan Gupta', service: 'Instagram Followers', amount: 900, status: 'completed' as const, date: '2024-07-28', link: 'https://instagram.com/example', quantity: 1000 },
-  { id: 'ORD-004', user: 'Sneha Reddy', service: 'YouTube Views', amount: 240, status: 'pending' as const, date: '2024-07-28', link: 'https://youtube.com/example2', quantity: 2000 },
-  { id: 'ORD-005', user: 'Vikram Kumar', service: 'YouTube Watch Time', amount: 2000, status: 'cancelled' as const, date: '2024-07-27', link: 'https://youtube.com/example3', quantity: 2000 },
-  { id: 'ORD-006', user: 'Anjali Mehta', service: 'YouTube Views', amount: 120, status: 'in progress' as const, date: '2024-07-30', link: 'https://www.youtube.com/watch?v=LXb3EKWsInQ', quantity: 1000 },
-];
+export const initialOrders = [];

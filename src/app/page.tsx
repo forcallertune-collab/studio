@@ -50,6 +50,11 @@ export default function Home() {
   
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    // On first signup, clear all previous local storage to ensure a fresh start
+    if (!localStorage.getItem('users')) {
+      localStorage.clear();
+    }
+    
     const users = JSON.parse(localStorage.getItem('users') || '{}');
     
     const emailExists = Object.values(users).some((u: any) => u.email === signupEmail);
@@ -128,7 +133,7 @@ export default function Home() {
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
-                <CardDescription>Join us! Registration is by referral only.</CardDescription>
+                <CardDescription>Join us and get a welcome bonus!</CardDescription>
               </CardHeader>
               <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">
@@ -146,7 +151,7 @@ export default function Home() {
                   </div>
                   <div className="relative">
                     <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="referral" type="text" placeholder="Referral Code" className="pl-10" required value={signupReferral} onChange={e => setSignupReferral(e.target.value)} />
+                    <Input id="referral" type="text" placeholder="Referral Code (Optional)" className="pl-10" value={signupReferral} onChange={e => setSignupReferral(e.target.value)} />
                   </div>
                   <div>
                     <Label className="mb-2 block">I am an:</Label>

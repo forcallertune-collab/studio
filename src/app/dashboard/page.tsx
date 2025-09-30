@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,19 @@ const quickAccessItems = [
 
 export default function DashboardPage() {
   const { walletBalance } = useContext(WalletContext);
+  const [taskCount, setTaskCount] = useState(0);
+  const [referralEarnings, setReferralEarnings] = useState(0);
+
+  useEffect(() => {
+    // These would be fetched from a real backend.
+    // Simulating dynamic data loading.
+    const timer = setTimeout(() => {
+        setTaskCount(Math.floor(Math.random() * 50));
+        setReferralEarnings(Math.random() * 500);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   return (
     <div className="grid gap-6">
@@ -34,7 +47,7 @@ export default function DashboardPage() {
               {walletBalance.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              +₹150.50 from yesterday
+              Your available balance
             </p>
           </CardContent>
         </Card>
@@ -45,10 +58,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold font-headline">
-              125
+              {taskCount}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              25 remaining for daily bonus
+              Keep it up!
             </p>
           </CardContent>
         </Card>
@@ -59,10 +72,10 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold font-headline">
-              ₹450.00
+              ₹{referralEarnings.toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Total from 15 active referrals
+              Total from your referrals
             </p>
           </CardContent>
         </Card>
