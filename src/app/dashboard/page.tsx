@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight, Youtube, Rocket } from 'lucide-react';
+import { ArrowUpRight, Youtube, Rocket, Users } from 'lucide-react';
 import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
@@ -13,6 +13,7 @@ import { WalletContext } from './layout';
 
 const quickAccessItems = [
     { title: "YouTube Tasks", description: "Views, Likes, Subs & Comments", href: "/dashboard/tasks/youtube", icon: Youtube },
+    { title: "Referral Program", description: "Build your team and earn commissions", href: "/dashboard/referrals", icon: Users },
     { title: "Advertiser Panel", description: "Create and manage campaigns", href: "/dashboard/advertiser", icon: Rocket },
 ]
 
@@ -75,7 +76,7 @@ export default function DashboardPage() {
               <CardTitle className="font-headline">Quick Access</CardTitle>
               <CardDescription>Jump right into your most important actions.</CardDescription>
             </CardHeader>
-            <CardContent className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="grid sm:grid-cols-1 md:grid-cols-3 gap-4">
               {quickAccessItems.map(item => (
                 <Link href={item.href} key={item.title}>
                   <div className="p-4 border rounded-lg hover:bg-accent/20 transition-colors h-full flex flex-col">

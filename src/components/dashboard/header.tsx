@@ -20,6 +20,7 @@ import {
   Home,
   LifeBuoy,
   Shield,
+  Users
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -47,6 +48,7 @@ const allNavItems = [
     { href: '/dashboard/tasks/app-downloads', icon: Download, label: 'App Downloads', roles: ['earner', 'both'] },
     { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet', roles: ['earner', 'advertiser', 'both'] },
     { href: '/dashboard/advertiser', icon: Rocket, label: 'Advertiser Panel', roles: ['advertiser', 'both'] },
+    { href: '/dashboard/referrals', icon: Users, label: 'Referrals', roles: ['earner', 'advertiser', 'both'] },
     { href: '/dashboard/profile', icon: User, label: 'Profile', roles: ['earner', 'advertiser', 'both'] },
     { href: '/dashboard/support', icon: LifeBuoy, label: 'Support', roles: ['earner', 'advertiser', 'both'] },
     { href: '/about', icon: Info, label: 'About Us', roles: ['earner', 'advertiser', 'both'] },

@@ -17,6 +17,7 @@ import {
   Info,
   LifeBuoy,
   Shield,
+  Users
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Logo from '../logo';
@@ -30,6 +31,7 @@ const commonNavItems = [
   { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/dashboard/profile', icon: User, label: 'Profile' },
   { href: '/dashboard/wallet', icon: Wallet, label: 'Wallet' },
+  { href: '/dashboard/referrals', icon: Users, label: 'Referrals' },
 ];
 
 const earnerNavItems = [
