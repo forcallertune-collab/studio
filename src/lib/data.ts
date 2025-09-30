@@ -1,5 +1,5 @@
 
-import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket } from './types';
+import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket, InstagramReelTask } from './types';
 import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram } from 'lucide-react';
 
 export const dummyUser: User = {
@@ -42,6 +42,18 @@ export const facebookFollowTasks: FacebookFollowTask[] = [
   { id: 'fbf-7', pageName: 'Comedy King', url: 'https://www.facebook.com/facebook', reward: 1.00 },
   { id: 'fbf-8', pageName: 'Fashion Icon', url: 'https://www.facebook.com/facebook', reward: 1.00 },
   { id: 'fbf-9', pageName: 'Health & Wellness Coach', url: 'https://www.facebook.com/facebook', reward: 1.00 },
+];
+
+export const instagramReelTasks: InstagramReelTask[] = [
+  { id: 'igr-1', reelTitle: 'Amazing Dance Moves', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-2', reelTitle: 'Quick Cooking Recipe', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-3', reelTitle: 'Funny Cat Moments', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-4', reelTitle: 'DIY Home Decor', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-5', reelTitle: 'Travel Diaries: Paris', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-6', reelTitle: 'Workout Motivation', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-7', reelTitle: 'Tech Gadget Review', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-8', reelTitle: 'Art & Painting', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
+  { id: 'igr-9', reelTitle: 'Life Hack Compilation', url: 'https://www.instagram.com/reels/C1AbCd23EfG/', reward: 0.75 },
 ];
 
 export const advertiserServices: AdvertiserService[] = [

@@ -55,6 +55,13 @@ export type FacebookFollowTask = {
   reward: number;
 };
 
+export type InstagramReelTask = {
+  id: string;
+  reelTitle: string;
+  url: string;
+  reward: number;
+};
+
 export type Platform = 'youtube' | 'facebook' | 'instagram';
 
 export type AdvertiserService = {
