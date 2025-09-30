@@ -1,10 +1,10 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Share2, Users, BadgeIndianRupee } from "lucide-react";
-import ReferralChart from "@/components/referral-chart";
 import { dummyUser } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 
@@ -68,15 +68,6 @@ export default function ReferralsPage() {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline">Referral Earning Potential</CardTitle>
-                    <CardDescription>This chart illustrates your potential monthly earnings as your referral network grows.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ReferralChart />
-                </CardContent>
-            </Card>
         </div>
     );
 }

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight, Youtube, Share2, Rocket } from 'lucide-react';
-import ReferralChart from '@/components/referral-chart';
 import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
@@ -70,8 +69,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+      <div className="grid lg:grid-cols-1 gap-6">
+        <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">Quick Access</CardTitle>
@@ -87,17 +86,6 @@ export default function DashboardPage() {
                   </div>
                 </Link>
               ))}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-2">
-           <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="font-headline">Referral Growth</CardTitle>
-              <CardDescription>Potential earnings based on referrals.</CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <ReferralChart />
             </CardContent>
           </Card>
         </div>
