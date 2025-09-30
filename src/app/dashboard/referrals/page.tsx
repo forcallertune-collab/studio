@@ -51,17 +51,17 @@ export default function ReferralsPage() {
                     <div className="grid md:grid-cols-3 gap-4 text-center">
                         <div className="p-4 bg-muted/50 rounded-lg">
                             <Users className="h-8 w-8 mx-auto text-primary mb-2" />
-                            <p className="text-2xl font-bold font-headline">15</p>
+                            <p className="text-2xl font-bold font-headline">0</p>
                             <p className="text-sm text-muted-foreground">Total Referrals</p>
                         </div>
                         <div className="p-4 bg-muted/50 rounded-lg">
                             <Users className="h-8 w-8 mx-auto text-primary mb-2" />
-                            <p className="text-2xl font-bold font-headline">12</p>
+                            <p className="text-2xl font-bold font-headline">0</p>
                             <p className="text-sm text-muted-foreground">Active Referrals</p>
                         </div>
                         <div className="p-4 bg-muted/50 rounded-lg">
                             <BadgeIndianRupee className="h-8 w-8 mx-auto text-accent-foreground mb-2" />
-                            <p className="text-2xl font-bold font-headline text-accent-foreground">₹450.00</p>
+                            <p className="text-2xl font-bold font-headline text-accent-foreground">₹0.00</p>
                             <p className="text-sm text-muted-foreground">Total Referral Earnings</p>
                         </div>
                     </div>
