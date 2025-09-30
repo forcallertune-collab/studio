@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight, Youtube, Share2, Rocket } from 'lucide-react';
+import { ArrowUpRight, Youtube, Video, Rocket } from 'lucide-react';
 import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
@@ -13,7 +13,7 @@ import { WalletContext } from './layout';
 
 const quickAccessItems = [
     { title: "YouTube Tasks", description: "Views, Likes, Subs & Comments", href: "/dashboard/tasks/youtube", icon: Youtube },
-    { title: "My Referrals", description: "View your team and earnings", href: "/dashboard/referrals", icon: Share2 },
+    { title: "Live Meeting", description: "Connect with your team", href: "/dashboard/meeting", icon: Video },
     { title: "Advertiser Panel", description: "Create and manage campaigns", href: "/dashboard/advertiser", icon: Rocket },
 ]
 
