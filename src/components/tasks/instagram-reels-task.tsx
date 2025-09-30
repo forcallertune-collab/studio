@@ -33,7 +33,7 @@ export default function InstagramReelsTask({ tasks }: InstagramReelsTasksProps) 
                 </div>
                 <Button asChild size="sm">
                   <a href={task.url} target="_blank" rel="noopener noreferrer">
-                    Watch Reel <ExternalLink className="ml-2 h-4 w-4"/>
+                    Go to Instagram <ExternalLink className="ml-2 h-4 w-4"/>
                   </a>
                 </Button>
               </div>
