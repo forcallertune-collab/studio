@@ -64,4 +64,6 @@ export const initialOrders = [
     { id: 'ORD-008', user: 'Advertiser Eight', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=taken_yv-2g', quantity: 12000, amount: 1440.00, status: 'in progress' as const, date: '2024-07-22'},
     { id: 'ORD-009', user: 'Advertiser Nine', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=0-7IHOXkiV8', quantity: 3000, amount: 360.00, status: 'in progress' as const, date: '2024-07-21'},
     { id: 'ORD-010', user: 'Advertiser Ten', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=ru0K8uYEbDE', quantity: 1000, amount: 120.00, status: 'in progress' as const, date: '2024-07-20'},
+    { id: 'ORD-011', user: 'Advertiser Eleven', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=6-HUgzYPm9g', quantity: 7500, amount: 900.00, status: 'in progress' as const, date: '2024-07-19'},
+    { id: 'ORD-012', user: 'Advertiser Twelve', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=hT_nvWreIhg', quantity: 25000, amount: 3000.00, status: 'in progress' as const, date: '2024-07-18'},
 ];
