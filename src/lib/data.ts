@@ -53,5 +53,15 @@ export const referralChartData = [
 
 export const initialSupportTickets: SupportTicket[] = [];
 
-export const initialOrders = [];
-
+export const initialOrders = [
+    {
+        id: 'ORD-001',
+        user: 'Advertiser One',
+        service: 'YouTube Views',
+        link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        quantity: 10000,
+        amount: 1200.00,
+        status: 'in progress' as const,
+        date: '2024-07-29',
+    }
+];
