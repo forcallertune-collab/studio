@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
 import type { LikeTask, SubscriptionTask, CommentTask } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, UserPlus, MessageSquare, ExternalLink } from 'lucide-react';
+import { ThumbsUp, UserPlus, MessageSquare, ExternalLink, CheckCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { moderateYouTubeComments } from '@/ai/flows/moderate-youtube-comments';
 import { initialOrders } from '@/lib/data';
+import YouTube, { YouTubePlayer } from 'react-youtube';
+import { WalletContext } from '@/app/dashboard/layout';
 
 type TaskType = 'like' | 'subscribe' | 'comment';
 
@@ -71,19 +73,40 @@ const getYouTubeVideoId = (url: string) => {
     }
 }
 
-const VideoPreviewDialog = ({ task, children }: { task: Task, children: React.ReactNode }) => {
+const VideoActionDialog = ({ task, onComplete, children, type }: { task: Task; onComplete: (taskId: string) => void; children: React.ReactNode; type: TaskType }) => {
+    const { toast } = useToast();
+    const [isOpen, setIsOpen] = useState(false);
+    const { setWalletBalance } = useContext(WalletContext);
+    
     const videoId = getYouTubeVideoId(task.url);
-    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
+    const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
     const title = 'videoTitle' in task ? task.videoTitle : ('channelName' in task ? task.channelName : '');
+    const { actionText, reward } = typeConfig[type];
+
+    const handleAction = () => {
+        setWalletBalance(prev => prev + reward);
+        onComplete(task.id);
+        toast({
+            title: 'Task Complete!',
+            description: `You've earned ₹${reward.toFixed(2)}.`,
+        });
+
+        // Open YouTube link in a new tab
+        window.open(task.url, '_blank');
+        setIsOpen(false);
+    };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
+                     <DialogDescription>
+                        Watch the video, then click the button below to go to YouTube and complete the action.
+                    </DialogDescription>
                 </DialogHeader>
                 {embedUrl ? (
                      <div className="aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
@@ -97,12 +120,10 @@ const VideoPreviewDialog = ({ task, children }: { task: Task, children: React.Re
                             className="w-full h-full"
                         ></iframe>
                      </div>
-                ) : <p>Could not load video.</p>}
+                ) : <p>Could not load video preview.</p>}
                 <DialogFooter>
-                    <Button asChild>
-                        <a href={task.url} target="_blank" rel="noopener noreferrer">
-                            Go to YouTube <ExternalLink className="ml-2 h-4 w-4" />
-                        </a>
+                    <Button onClick={handleAction}>
+                        Go to YouTube & {actionText} <ExternalLink className="ml-2 h-4 w-4" />
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -110,8 +131,9 @@ const VideoPreviewDialog = ({ task, children }: { task: Task, children: React.Re
     )
 }
 
-const CommentDialog = ({ task }: { task: CommentTask }) => {
+const CommentDialog = ({ task, onComplete }: { task: CommentTask, onComplete: (taskId: string) => void }) => {
     const { toast } = useToast();
+    const { setWalletBalance } = useContext(WalletContext);
     const [comment, setComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -121,6 +143,8 @@ const CommentDialog = ({ task }: { task: CommentTask }) => {
         try {
             const result = await moderateYouTubeComments({ comment, templates: task.templates });
             if (result.isApproved) {
+                setWalletBalance(prev => prev + task.reward);
+                onComplete(task.id);
                 toast({
                     title: "Comment Approved!",
                     description: `You've earned ₹${task.reward.toFixed(2)}.`,
@@ -227,7 +251,14 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
       return () => window.removeEventListener('storage', loadTasks);
   }, [loadTasks]);
 
-  if (tasks.length === 0) {
+  const handleTaskComplete = (taskId: string) => {
+    setCompletedTasks(prev => new Set(prev).add(taskId));
+  };
+
+
+  const availableTasks = tasks.filter(task => !completedTasks.has(task.id));
+
+  if (availableTasks.length === 0) {
       return (
           <Card>
               <CardHeader>
@@ -237,7 +268,7 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
               </CardHeader>
               <CardContent>
                   <div className="text-center py-12 bg-muted/50 rounded-lg">
-                      <p className="text-muted-foreground">No {type} tasks available right now.</p>
+                      <p className="text-muted-foreground">No new {type} tasks available right now.</p>
                   </div>
               </CardContent>
           </Card>
@@ -255,7 +286,9 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
       <CardContent>
         <div className="border rounded-lg">
           <div className="divide-y">
-            {tasks.map((task) => (
+            {availableTasks.map((task) => {
+              const isCompleted = completedTasks.has(task.id);
+              return (
               <div key={task.id} className="p-3 flex items-center justify-between">
                 <div>
                   <p className="font-semibold">
@@ -263,20 +296,27 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
                   </p>
                   <p className="text-sm text-primary font-bold">+ ₹{task.reward.toFixed(2)}</p>
                 </div>
-                {type === 'comment' ? (
-                   <CommentDialog task={task as CommentTask} />
+                {isCompleted ? (
+                   <div className="flex items-center gap-2 text-green-600 font-semibold text-sm pr-4">
+                        <CheckCircle className="h-5 w-5" />
+                        <span>Completed</span>
+                    </div>
+                ) : type === 'comment' ? (
+                   <CommentDialog task={task as CommentTask} onComplete={handleTaskComplete} />
                 ) : (
-                  <VideoPreviewDialog task={task}>
+                  <VideoActionDialog task={task} onComplete={handleTaskComplete} type={type}>
                     <Button size="sm">
                       {config.actionText}
                     </Button>
-                  </VideoPreviewDialog>
+                  </VideoActionDialog>
                 )}
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </CardContent>
     </Card>
   );
 }
+
+    
