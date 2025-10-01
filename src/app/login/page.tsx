@@ -31,9 +31,18 @@ function SignupForm() {
   const [role, setRole] = useState<'earner' | 'advertiser' | 'both'>('earner');
 
   useEffect(() => {
+    // Reset all fields on component mount
+    setSignupName('');
+    setSignupEmail('');
+    setSignupPassword('');
+    setSignupUpiId('');
+    
+    // Only set the referral code from URL params
     const refCode = searchParams.get('ref');
     if (refCode) {
       setSignupReferral(refCode);
+    } else {
+      setSignupReferral('');
     }
   }, [searchParams]);
 
@@ -155,13 +164,16 @@ function LoginPageContent() {
   const [loginPassword, setLoginPassword] = useState('');
 
   useEffect(() => {
-    // If a referral code is in the URL, switch to the signup tab
-    if (searchParams.has('ref')) {
-      setActiveTab('signup');
-    }
     // Always clear login fields on component mount to avoid showing stale data
     setLoginEmail('');
     setLoginPassword('');
+    
+    // If a referral code is in the URL, switch to the signup tab
+    if (searchParams.has('ref')) {
+      setActiveTab('signup');
+    } else {
+      setActiveTab('login');
+    }
   }, [searchParams]);
 
   const handleLogin = (e: React.FormEvent) => {
