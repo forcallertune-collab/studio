@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-             <div className="mt-8 grid md:grid-cols-2 gap-8">
+             <div className="mt-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Recent Activity</CardTitle>
@@ -104,28 +104,6 @@ export default function AdminDashboardPage() {
                         {/* A more detailed activity log could be implemented here */}
                         <div className="text-center py-12 bg-muted/50 rounded-lg">
                             <p className="text-muted-foreground">Activity feed coming soon.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Megaphone /> Broadcast Message</CardTitle>
-                        <CardDescription>Post a message that will be shown to all users on the homepage and dashboard.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Label htmlFor="announcement-message">Your Message</Label>
-                            <Textarea 
-                                id="announcement-message"
-                                placeholder="e.g., Scheduled maintenance tomorrow from 2 AM to 3 AM."
-                                value={announcement}
-                                onChange={(e) => setAnnouncement(e.target.value)}
-                                rows={4}
-                            />
-                        </div>
-                         <div className="flex gap-2">
-                            <Button onClick={handleSaveAnnouncement}>Publish Announcement</Button>
-                            <Button variant="outline" onClick={handleClearAnnouncement}>Clear</Button>
                         </div>
                     </CardContent>
                 </Card>
