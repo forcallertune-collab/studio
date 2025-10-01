@@ -5,7 +5,6 @@ import React, { useState, useEffect, createContext, useMemo } from 'react';
 import DashboardSidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
 import WelcomeDialog from '@/components/welcome-dialog';
-import { dummyUser } from '@/lib/data';
 import type { User } from '@/lib/types';
 
 

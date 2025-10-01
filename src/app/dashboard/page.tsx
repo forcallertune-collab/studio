@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight, Youtube, Rocket, Users, Megaphone } from 'lucide-react';
-import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
 import { WalletContext, TaskContext } from './layout';
@@ -62,7 +61,7 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Tasks Completed Today</CardTitle>
              <span className="text-2xl text-primary">✔</span>
-          </CardHeader>
+          </Header>
           <CardContent>
             <div className="text-4xl font-bold font-headline">
               {taskCount}
@@ -76,7 +75,7 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Referral Earnings</CardTitle>
              <span className="text-2xl text-primary">👥</span>
-          </CardHeader>
+          </Header>
           <CardContent>
             <div className="text-4xl font-bold font-headline">
               ₹{referralEarnings.toFixed(2)}

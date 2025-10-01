@@ -2,18 +2,6 @@
 import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket, InstagramReelTask } from './types';
 import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram, Download, Star } from 'lucide-react';
 
-export const dummyUser: User = {
-  userId: 'dummy-user-01',
-  name: 'Ankit Sharma',
-  email: 'ankit.sharma@example.com',
-  password: 'password123',
-  role: 'both',
-  referralCode: 'ANKIT2024',
-  walletBalance: 0.00,
-  upiId: 'ankit.sharma@upi',
-  avatarUrl: `https://i.pravatar.cc/150?u=ankit.sharma@example.com`,
-};
-
 export const advertiserServices: AdvertiserService[] = [
   // YouTube
   { id: 'yt-subs', serviceName: 'YouTube Subscribers', platform: 'youtube', name: 'Subscribers', price: 1200, unit: 'per 1k', icon: UserPlus, min: 100, max: 10000 },
@@ -33,16 +21,6 @@ export const advertiserServices: AdvertiserService[] = [
   { id: 'app-downloads', serviceName: 'App Downloads', platform: 'app', name: 'App Downloads', price: 2000, unit: 'per 1k', icon: Download, min: 100, max: 10000 },
   // Google Reviews
   { id: 'google-reviews', serviceName: 'Google Reviews', platform: 'google', name: 'Google Reviews', price: 3000, unit: 'per 1k', icon: Star, min: 50, max: 5000 },
-];
-
-export const referralChartData = [
-  { referrals: 10, earnings: 150 },
-  { referrals: 20, earnings: 300 },
-  { referrals: 30, earnings: 450 },
-  { referrals: 40, earnings: 600 },
-  { referrals: 50, earnings: 750 },
-  { referrals: 60, earnings: 900 },
-  { referrals: 70, earnings: 1050 },
 ];
 
 export const initialSupportTickets: SupportTicket[] = [];
