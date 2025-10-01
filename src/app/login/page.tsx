@@ -37,6 +37,10 @@ function SignupForm() {
     }
   }, [searchParams]);
 
+  const generateReferralCode = () => {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
+  };
+
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     // On first signup, clear all previous local storage to ensure a fresh start
@@ -64,7 +68,7 @@ function SignupForm() {
         password: signupPassword, // In a real app, this should be hashed
         upiId: signupUpiId,
         role: role,
-        referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
+        referralCode: generateReferralCode(),
         referredBy: signupReferral || undefined,
         walletBalance: 0.00,
         transactions: [],
