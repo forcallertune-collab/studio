@@ -5,10 +5,11 @@
 import { useContext, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Wallet, BadgeIndianRupee, History, Copy, Upload } from "lucide-react";
+import { Wallet, BadgeIndianRupee, History, Copy, Upload, Check } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -42,6 +43,7 @@ export default function WalletPage() {
     // Withdrawal state
     const [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
     const [isWithdrawalDialog, setIsWithdrawalDialog] = useState(false);
+    const [isUpiConfirmed, setIsUpiConfirmed] = useState(false);
 
 
     const copyToClipboard = (text: string, subject: string) => {
@@ -117,6 +119,11 @@ export default function WalletPage() {
             toast({ title: 'UPI ID Missing', description: <>Please add your UPI ID in your <Link href="/dashboard/profile" className="underline">profile</Link> before withdrawing.</>, variant: 'destructive' });
             return;
         }
+        if (!isUpiConfirmed) {
+            toast({ title: 'Confirmation Required', description: 'Please confirm your UPI ID is correct.', variant: 'destructive' });
+            return;
+        }
+
 
         const requestId = `WTH-${Date.now()}`;
         
@@ -164,6 +171,7 @@ export default function WalletPage() {
 
         setIsWithdrawalDialog(false);
         setWithdrawalAmount('');
+        setIsUpiConfirmed(false);
     };
 
     const sortedTransactions = user?.transactions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) || [];
@@ -275,7 +283,7 @@ export default function WalletPage() {
                                 max={walletBalance}
                             />
                         </div>
-                        <AlertDialog open={isWithdrawalDialog} onOpenChange={setIsWithdrawalDialog}>
+                        <AlertDialog open={isWithdrawalDialog} onOpenChange={(open) => { setIsWithdrawalDialog(open); if(!open) setIsUpiConfirmed(false); }}>
                             <AlertDialogTrigger asChild>
                                 <Button 
                                     className="w-full sm:w-auto" 
@@ -289,13 +297,38 @@ export default function WalletPage() {
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Confirm Withdrawal</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        You are about to request a withdrawal of <span className="font-bold text-foreground">₹{Number(withdrawalAmount).toFixed(2)}</span> to your UPI ID: <span className="font-mono text-foreground">{user?.upiId || 'Not Set'}</span>.
+                                        You are about to request a withdrawal of <span className="font-bold text-foreground">₹{Number(withdrawalAmount).toFixed(2)}</span>.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <p className="text-sm text-muted-foreground">The amount will be deducted from your wallet and is subject to admin approval within 2 hours.</p>
+                                {user?.upiId ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm">Funds will be sent to the following UPI ID:</p>
+                                        <div className="border rounded-md px-4 py-2 bg-muted">
+                                            <p className="font-mono font-semibold text-center text-lg">{user.upiId}</p>
+                                        </div>
+                                         <div className="flex items-center space-x-2">
+                                            <Checkbox id="upi-confirm" checked={isUpiConfirmed} onCheckedChange={(checked) => setIsUpiConfirmed(checked as boolean)} />
+                                            <label
+                                                htmlFor="upi-confirm"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                I confirm the UPI ID above is correct.
+                                            </label>
+                                        </div>
+                                         <p className="text-xs text-muted-foreground">To change your UPI ID, please visit your <Link href="/dashboard/profile" className="underline">profile page</Link>.</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-4">
+                                        <p className="text-destructive">You have not set a UPI ID.</p>
+                                        <Button asChild variant="link">
+                                            <Link href="/dashboard/profile">Go to Profile to add one</Link>
+                                        </Button>
+                                    </div>
+                                )}
+                               
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleWithdrawalRequest}>Confirm & Withdraw</AlertDialogAction>
+                                    <AlertDialogAction onClick={handleWithdrawalRequest} disabled={!isUpiConfirmed || !user?.upiId}>Confirm & Withdraw</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>

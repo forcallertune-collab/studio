@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AtSign, KeyRound, ArrowRight, Users, UserPlus, User as UserIcon } from 'lucide-react';
+import { AtSign, KeyRound, ArrowRight, Users, UserPlus, User as UserIcon, BadgeIndianRupee } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +26,7 @@ function SignupForm() {
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [signupUpiId, setSignupUpiId] = useState('');
   const [signupReferral, setSignupReferral] = useState('');
   const [role, setRole] = useState<'earner' | 'advertiser' | 'both'>('earner');
 
@@ -61,6 +62,7 @@ function SignupForm() {
         name: signupName,
         email: signupEmail,
         password: signupPassword, // In a real app, this should be hashed
+        upiId: signupUpiId,
         role: role,
         referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
         walletBalance: 0.00,
@@ -96,6 +98,10 @@ function SignupForm() {
             <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input id="email-signup" type="email" placeholder="Email or Mobile Number" className="pl-10" required value={signupEmail} onChange={e => setSignupEmail(e.target.value)} />
           </div>
+           <div className="relative">
+                <BadgeIndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input id="upiId-signup" type="text" placeholder="UPI ID or Mobile Number" className="pl-10" required value={signupUpiId} onChange={e => setSignupUpiId(e.target.value)} />
+            </div>
           <div className="relative">
             <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input id="password-signup" type="password" placeholder="Password" className="pl-10" required value={signupPassword} onChange={e => setSignupPassword(e.target.value)} />
