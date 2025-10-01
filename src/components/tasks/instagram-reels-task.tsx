@@ -80,7 +80,7 @@ export default function InstagramReelsTask() {
         <CardDescription>Watch these Reels to earn money. Click on any video below to go to Instagram.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {tasks.map((task, index) => {
              const isCompleted = completedTasks.has(task.id);
              return (

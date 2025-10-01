@@ -179,7 +179,7 @@ export default function YoutubeViewsTask() {
                 <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Click on any video below to start.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {tasks.map(task => {
                         const videoId = getYouTubeVideoId(task.url);
                         const isCompleted = completedTasks.has(task.id);
