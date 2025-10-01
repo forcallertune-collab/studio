@@ -1,12 +1,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import type { FacebookLikeTask, FacebookFollowTask } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, UserPlus, ExternalLink } from 'lucide-react';
+import { ThumbsUp, UserPlus, ExternalLink, CheckCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { initialOrders } from '@/lib/data';
+import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 
 type TaskType = 'like' | 'follow';
 type Task = FacebookLikeTask | FacebookFollowTask;
@@ -18,7 +20,7 @@ type FacebookTasksProps = {
 const typeConfig = {
   like: {
     title: 'Like Pages & Posts',
-    description: 'Like these pages or posts to earn ₹0.50 per like.',
+    description: 'Like these pages or posts to earn money.',
     icon: ThumbsUp,
     actionText: 'Like Page',
     serviceName: 'Facebook Page Likes',
@@ -26,7 +28,7 @@ const typeConfig = {
   },
   follow: {
     title: 'Follow Profiles',
-    description: 'Follow these profiles to earn ₹1.00 per follow.',
+    description: 'Follow these profiles to earn money.',
     icon: UserPlus,
     actionText: 'Follow',
     serviceName: 'Facebook Followers',
@@ -36,7 +38,11 @@ const typeConfig = {
 
 export default function FacebookTasks({ type }: FacebookTasksProps) {
   const config = typeConfig[type];
+  const { toast } = useToast();
+  const { setWalletBalance } = useContext(WalletContext);
+  const { incrementTaskCount } = useContext(TaskContext);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
 
   const loadTasks = useCallback(() => {
     const savedOrders = localStorage.getItem('adminOrders');
@@ -60,7 +66,20 @@ export default function FacebookTasks({ type }: FacebookTasksProps) {
     return () => window.removeEventListener('storage', loadTasks);
   }, [loadTasks]);
 
-  if (tasks.length === 0) {
+  const handleTaskComplete = (task: Task) => {
+    setWalletBalance(prev => prev + task.reward);
+    incrementTaskCount();
+    setCompletedTasks(prev => new Set(prev).add(task.id));
+    window.open(task.url, '_blank');
+    toast({
+        title: 'Task Complete!',
+        description: `You've earned ₹${task.reward.toFixed(2)}.`,
+    });
+  }
+
+  const availableTasks = tasks.filter(task => !completedTasks.has(task.id));
+
+  if (availableTasks.length === 0) {
     return (
         <Card>
             <CardHeader>
@@ -88,7 +107,7 @@ export default function FacebookTasks({ type }: FacebookTasksProps) {
       <CardContent>
         <div className="border rounded-lg">
           <div className="divide-y">
-            {tasks.map((task) => (
+            {availableTasks.map((task) => (
               <div key={task.id} className="p-3 flex items-center justify-between">
                 <div>
                   <p className="font-semibold">
@@ -96,12 +115,24 @@ export default function FacebookTasks({ type }: FacebookTasksProps) {
                   </p>
                   <p className="text-sm text-primary font-bold">+ ₹{task.reward.toFixed(2)}</p>
                 </div>
-                <Button asChild size="sm">
-                  <a href={task.url} target="_blank" rel="noopener noreferrer">
+                <Button onClick={() => handleTaskComplete(task)} size="sm">
                     {config.actionText} <ExternalLink className="ml-2 h-4 w-4"/>
-                  </a>
                 </Button>
               </div>
+            ))}
+             {tasks.filter(task => completedTasks.has(task.id)).map(task => (
+                 <div key={task.id} className="p-3 flex items-center justify-between bg-muted/50">
+                    <div>
+                        <p className="font-semibold text-muted-foreground line-through">
+                            {task.pageName}
+                        </p>
+                         <p className="text-sm text-primary/50 font-bold">+ ₹{task.reward.toFixed(2)}</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-green-600 font-semibold text-sm">
+                        <CheckCircle className="h-5 w-5" />
+                        <span>Completed</span>
+                    </div>
+                </div>
             ))}
           </div>
         </div>
