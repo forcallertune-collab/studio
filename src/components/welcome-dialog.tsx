@@ -27,7 +27,7 @@ export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
 
   useEffect(() => {
     if (isOpen && user?.referralCode) {
-        setReferralLink(`${window.location.origin}/?ref=${user.referralCode}`);
+        setReferralLink(`${window.location.origin}/login?ref=${user.referralCode}`);
     }
   }, [isOpen, user?.referralCode]);
 

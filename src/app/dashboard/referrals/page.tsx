@@ -18,7 +18,7 @@ export default function ReferralsPage() {
 
     useEffect(() => {
         if (user?.referralCode) {
-            setReferralLink(`${window.location.origin}/?ref=${user.referralCode}`);
+            setReferralLink(`${window.location.origin}/login?ref=${user.referralCode}`);
         }
     }, [user?.referralCode]);
 

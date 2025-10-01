@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="container mx-auto flex justify-between items-center">
             <Logo />
             <Button asChild>
-                <Link href="/">Join Now</Link>
+                <Link href="/login">Join Now</Link>
             </Button>
         </div>
        </header>
@@ -74,7 +74,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold font-headline mb-4">Ready to Start?</h2>
             <p className="text-muted-foreground mb-8">Join thousands of others and start your earning journey today!</p>
             <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link href="/">Sign Up & Earn</Link>
+                <Link href="/login">Sign Up & Earn</Link>
             </Button>
         </section>
 

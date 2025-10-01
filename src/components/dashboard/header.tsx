@@ -68,7 +68,7 @@ export default function DashboardHeader() {
 
   const handleLogout = () => {
     localStorage.removeItem('loggedInUserId');
-    router.push('/');
+    router.push('/login');
   };
 
   if (!user) {
