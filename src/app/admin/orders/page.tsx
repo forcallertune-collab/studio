@@ -31,6 +31,7 @@ export default function AdminOrdersPage() {
     const loadOrders = () => {
         if (typeof window !== 'undefined') {
             const savedOrders = localStorage.getItem('adminOrders');
+            // Ensure initialOrders is used as a fallback if nothing is in localStorage
             setOrders(savedOrders ? JSON.parse(savedOrders) : initialOrders);
         }
     };
@@ -60,10 +61,18 @@ export default function AdminOrdersPage() {
             order.id === orderId ? { ...order, status: newStatus } : order
         );
         setOrders(updatedOrders);
-        localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
         
-        // Manually dispatch a storage event to notify other components (like task pages) immediately
-        window.dispatchEvent(new StorageEvent('storage', { key: 'adminOrders' }));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+            
+            // Manually dispatch a storage event to notify other components (like task pages) immediately
+            window.dispatchEvent(new StorageEvent('storage', { 
+                key: 'adminOrders',
+                newValue: JSON.stringify(updatedOrders),
+                oldValue: localStorage.getItem('adminOrders'),
+                storageArea: localStorage,
+            }));
+        }
     };
 
     return (
@@ -87,7 +96,7 @@ export default function AdminOrdersPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.map((order) => (
+                        {orders.length > 0 ? orders.map((order) => (
                             <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.id}</TableCell>
                                 <TableCell>{order.user}</TableCell>
@@ -99,9 +108,9 @@ export default function AdminOrdersPage() {
                                 <TableCell>₹{order.amount.toFixed(2)}</TableCell>
                                 <TableCell>
                                     <Select value={order.status} onValueChange={(value) => handleStatusChange(order.id, value as OrderStatus)}>
-                                        <SelectTrigger className="w-[120px] focus:ring-0 focus:ring-offset-0">
+                                        <SelectTrigger className="w-[130px] focus:ring-0 focus:ring-offset-0">
                                             <SelectValue>
-                                                <Badge variant={order.status === 'cancelled' ? 'destructive' : 'secondary'} 
+                                                <Badge variant={order.status === 'cancelled' || order.status === 'failed' ? 'destructive' : 'secondary'} 
                                                        className={cn('capitalize', {
                                                             'bg-green-600 text-white': order.status === 'completed',
                                                             'bg-yellow-500 text-white': order.status === 'in progress',
@@ -112,8 +121,8 @@ export default function AdminOrdersPage() {
                                             </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="pending">Pending (Hidden)</SelectItem>
                                             <SelectItem value="in progress">In Progress (Active)</SelectItem>
+                                            <SelectItem value="pending">Pending (Hidden)</SelectItem>
                                             <SelectItem value="completed">Completed (Hidden)</SelectItem>
                                             <SelectItem value="cancelled">Cancelled (Hidden)</SelectItem>
                                         </SelectContent>
@@ -121,7 +130,13 @@ export default function AdminOrdersPage() {
                                 </TableCell>
                                 <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                             </TableRow>
-                        ))}
+                        )) : (
+                             <TableRow>
+                                <TableCell colSpan={8} className="h-24 text-center">
+                                    No orders have been placed yet.
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </CardContent>
