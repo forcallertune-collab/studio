@@ -8,24 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { initialOrders } from '@/lib/data';
+import type { Order, User, Transaction } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 type OrderStatus = 'completed' | 'processing' | 'pending' | 'failed' | 'cancelled' | 'in progress';
 
-// A type for the orders to ensure consistency
-type Order = {
-    id: string;
-    user: string;
-    service: string;
-    link: string;
-    quantity: number;
-    amount: number;
-    status: OrderStatus;
-    date: string;
-};
-
-
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
+    const { toast } = useToast();
 
     // Function to load orders from localStorage
     const loadOrders = () => {
@@ -57,9 +47,49 @@ export default function AdminOrdersPage() {
     }, []);
 
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-        const updatedOrders = orders.map(order => 
+        const orderToUpdate = orders.find(order => order.id === orderId);
+        if (!orderToUpdate) return;
+        
+        let updatedOrders = orders.map(order =>
             order.id === orderId ? { ...order, status: newStatus } : order
         );
+
+        if (newStatus === 'cancelled' && orderToUpdate.status !== 'cancelled') {
+             // Refund logic
+            const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
+            const userToUpdate = allUsers[orderToUpdate.userId];
+
+            if (userToUpdate) {
+                userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + orderToUpdate.amount;
+
+                const refundTransaction: Transaction = {
+                    id: `REFUND-${Date.now()}`,
+                    type: 'recharge', // Or a new 'refund' type
+                    amount: orderToUpdate.amount,
+                    status: 'completed',
+                    date: new Date().toISOString(),
+                    description: 'Order Canceled - Refund',
+                };
+                userToUpdate.transactions = [...(userToUpdate.transactions || []), refundTransaction];
+                
+                allUsers[orderToUpdate.userId] = userToUpdate;
+                localStorage.setItem('users', JSON.stringify(allUsers));
+                window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+                
+                toast({
+                    title: 'Order Cancelled & Refunded',
+                    description: `₹${orderToUpdate.amount.toFixed(2)} has been refunded to ${userToUpdate.name}.`,
+                });
+            } else {
+                 toast({
+                    title: 'Refund Failed',
+                    description: `Could not find user ${orderToUpdate.userId} to issue a refund.`,
+                    variant: 'destructive',
+                });
+            }
+        }
+
+
         setOrders(updatedOrders);
         
         if (typeof window !== 'undefined') {
@@ -124,7 +154,7 @@ export default function AdminOrdersPage() {
                                             <SelectItem value="in progress">In Progress (Active)</SelectItem>
                                             <SelectItem value="pending">Pending (Hidden)</SelectItem>
                                             <SelectItem value="completed">Completed (Hidden)</SelectItem>
-                                            <SelectItem value="cancelled">Cancelled (Hidden)</SelectItem>
+                                            <SelectItem value="cancelled">Cancelled (Refund)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </TableCell>
