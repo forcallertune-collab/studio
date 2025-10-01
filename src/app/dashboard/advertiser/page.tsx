@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { advertiserServices, initialOrders } from "@/lib/data";
-import type { Platform } from "@/lib/types";
+import type { Platform, Transaction } from "@/lib/types";
 import { Rocket, Youtube, Facebook, Instagram, Wallet } from "lucide-react";
 import { WalletContext, UserContext } from "../layout";
 
@@ -21,8 +21,8 @@ const platformIcons = {
 
 export default function AdvertiserPage() {
     const { toast } = useToast();
-    const { walletBalance, setWalletBalance } = useContext(WalletContext);
-    const { user } = useContext(UserContext);
+    const { walletBalance } = useContext(WalletContext);
+    const { user, setUser } = useContext(UserContext);
     const [platform, setPlatform] = useState<Platform | null>(null);
     const [serviceId, setServiceId] = useState<string | null>(null);
     const [link, setLink] = useState('');
@@ -32,7 +32,7 @@ export default function AdvertiserPage() {
         e.preventDefault();
         const selectedService = advertiserServices.find(s => s.id === serviceId);
 
-        if (!selectedService || !user) return;
+        if (!selectedService || !user || !setUser) return;
         
         if (totalCost > walletBalance) {
             toast({
@@ -44,7 +44,26 @@ export default function AdvertiserPage() {
         }
 
         const newBalance = walletBalance - totalCost;
-        setWalletBalance(newBalance);
+
+        const newTransaction: Transaction = {
+          id: `ORD-TXN-${Date.now()}`,
+          type: 'task_earning', // Using a generic type, can be more specific
+          amount: totalCost,
+          status: 'completed',
+          date: new Date().toISOString(),
+          description: `Order for ${selectedService.name}: ${quantity}`,
+        };
+
+        // Update user state which will trigger persistence in layout.tsx
+        setUser(prevUser => {
+          if (!prevUser) return null;
+          return {
+            ...prevUser,
+            walletBalance: newBalance,
+            transactions: [...(prevUser.transactions || []), newTransaction],
+          }
+        });
+
 
         // Save the new order to localStorage
         const savedOrders = localStorage.getItem('adminOrders');
@@ -53,12 +72,12 @@ export default function AdvertiserPage() {
         const newOrder = {
             id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
             user: user.name,
-            service: selectedService.serviceName,
+            service: selectedService.name, // Use the proper service name
             link: link,
             quantity: Number(quantity),
             amount: totalCost,
             status: 'in progress' as const,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toISOString(),
         };
 
         const updatedOrders = [newOrder, ...orders];
@@ -225,7 +244,7 @@ export default function AdvertiserPage() {
                     </div>
                 </CardContent>
                 <CardContent>
-                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !quantity || totalCost > walletBalance}>
+                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !quantity || totalCost > walletBalance || totalCost <= 0}>
                      {totalCost > walletBalance ? 'Insufficient Funds' : 'Place Order'}
                    </Button>
                 </CardContent>

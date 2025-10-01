@@ -107,19 +107,15 @@ export default function DashboardLayout({
         const loggedInUserId = localStorage.getItem('loggedInUserId');
         
         if (loggedInUserId && allUsers[loggedInUserId]) {
-            // Create an updated user object
-            const updatedUser = { 
-                ...user, 
-                walletBalance: user.walletBalance, // Ensure wallet balance is from the user state
-            };
-            allUsers[loggedInUserId] = updatedUser;
+            allUsers[loggedInUserId] = user;
             localStorage.setItem('users', JSON.stringify(allUsers));
         }
 
         if (user.role) {
             localStorage.setItem('userRole', user.role);
         }
-        setWalletBalance(user.walletBalance); // Also update the separate wallet balance state
+        // Update the wallet context state if the user's balance has changed
+        setWalletBalance(user.walletBalance); 
     }
   }, [user]);
 
