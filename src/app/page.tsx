@@ -1,11 +1,15 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Logo from '@/components/logo';
-import { ArrowRight, CheckCircle, Users, BarChart } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, BarChart, Megaphone, X } from 'lucide-react';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const features = [
     {
@@ -26,6 +30,16 @@ const features = [
 ]
 
 export default function WelcomePage() {
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+
+  useEffect(() => {
+    const savedAnnouncement = localStorage.getItem('sociara-announcement');
+    if (savedAnnouncement) {
+      setAnnouncement(savedAnnouncement);
+    }
+  }, []);
+
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -45,6 +59,18 @@ export default function WelcomePage() {
 
       {/* Main Content */}
       <main>
+        {announcement && (
+          <div className="container mx-auto px-4 pt-6">
+            <Alert>
+              <Megaphone className="h-4 w-4" />
+              <AlertTitle>Announcement</AlertTitle>
+              <AlertDescription>
+                {announcement}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+        
         {/* Hero Section */}
         <section className="relative py-20 md:py-32">
              <div 

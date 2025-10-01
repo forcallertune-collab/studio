@@ -1,7 +1,42 @@
+
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BadgeIndianRupee, Package, Users, LifeBuoy } from "lucide-react";
+import { BadgeIndianRupee, Package, Users, LifeBuoy, Megaphone } from "lucide-react";
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
 
 export default function AdminDashboardPage() {
+    const { toast } = useToast();
+    const [announcement, setAnnouncement] = useState('');
+
+    useEffect(() => {
+        const savedAnnouncement = localStorage.getItem('sociara-announcement');
+        if (savedAnnouncement) {
+            setAnnouncement(savedAnnouncement);
+        }
+    }, []);
+    
+    const handleSaveAnnouncement = () => {
+        localStorage.setItem('sociara-announcement', announcement);
+        toast({
+            title: 'Announcement Published',
+            description: 'The message is now live for all users.',
+        });
+    };
+
+    const handleClearAnnouncement = () => {
+        setAnnouncement('');
+        localStorage.removeItem('sociara-announcement');
+        toast({
+            title: 'Announcement Cleared',
+        });
+    };
+
+
     return (
         <div>
             <h1 className="text-2xl font-bold font-headline mb-6">Admin Dashboard</h1>
@@ -59,7 +94,7 @@ export default function AdminDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-             <div className="mt-8">
+             <div className="mt-8 grid md:grid-cols-2 gap-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Recent Activity</CardTitle>
@@ -69,6 +104,28 @@ export default function AdminDashboardPage() {
                         {/* A more detailed activity log could be implemented here */}
                         <div className="text-center py-12 bg-muted/50 rounded-lg">
                             <p className="text-muted-foreground">Activity feed coming soon.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Megaphone /> Broadcast Message</CardTitle>
+                        <CardDescription>Post a message that will be shown to all users on the homepage and dashboard.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label htmlFor="announcement-message">Your Message</Label>
+                            <Textarea 
+                                id="announcement-message"
+                                placeholder="e.g., Scheduled maintenance tomorrow from 2 AM to 3 AM."
+                                value={announcement}
+                                onChange={(e) => setAnnouncement(e.target.value)}
+                                rows={4}
+                            />
+                        </div>
+                         <div className="flex gap-2">
+                            <Button onClick={handleSaveAnnouncement}>Publish Announcement</Button>
+                            <Button variant="outline" onClick={handleClearAnnouncement}>Clear</Button>
                         </div>
                     </CardContent>
                 </Card>
