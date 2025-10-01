@@ -177,7 +177,7 @@ export default function YoutubeViewsTask() {
             <CardHeader>
                 <CardTitle>Watch Videos & Earn</CardTitle>
                 <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Click on any video below to start.</CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {tasks.map(task => {
@@ -216,3 +216,4 @@ export default function YoutubeViewsTask() {
         </Card>
     );
 }
+
