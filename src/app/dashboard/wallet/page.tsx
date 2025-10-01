@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useContext, useState } from 'react';
@@ -221,12 +222,12 @@ export default function WalletPage() {
                                 </AlertDialogHeader>
                                 <div className='flex flex-col items-center justify-center gap-4 py-4'>
                                     <Image
-                                        src="https://firebasestorage.googleapis.com/v0/b/project-os-prod.appspot.com/o/public%2Fe913a48e-f14a-4467-850f-244b150937a0?alt=media&token=894d509f-b481-4340-951b-53c233157f13"
+                                        src={placeholderImages.placeholderImages[6].imageUrl}
                                         alt="QR Code"
                                         width={200}
                                         height={200}
                                         className="rounded-lg border p-1"
-                                        data-ai-hint="payment qr code"
+                                        data-ai-hint={placeholderImages.placeholderImages[6].imageHint}
                                     />
                                     <div className='text-center'>
                                         <p className='text-sm text-muted-foreground'>Transaction ID:</p>

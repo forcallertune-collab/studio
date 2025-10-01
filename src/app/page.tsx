@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -62,6 +63,7 @@ function SignupForm() {
         role: role,
         referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
         walletBalance: 0.00,
+        transactions: [],
     };
 
     users[userId] = newUser; // Use userId as the key
