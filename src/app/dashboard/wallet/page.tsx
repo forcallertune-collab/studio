@@ -48,11 +48,10 @@ export default function WalletPage() {
         setTransactionId(newTransactionId);
     }
 
-    const copyTransactionId = () => {
-        if (!transactionId) return;
-        navigator.clipboard.writeText(transactionId);
+    const copyToClipboard = (text: string, subject: string) => {
+        navigator.clipboard.writeText(text);
         toast({
-            title: "Copied Transaction ID!",
+            title: `Copied ${subject}!`,
         });
     }
 
@@ -215,25 +214,35 @@ export default function WalletPage() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
-                                <AlertDialogTitle>Scan to Pay</AlertDialogTitle>
+                                <AlertDialogTitle>Complete Your Payment</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)}. After paying, click "I have paid".
+                                    Pay ₹{Number(rechargeAmount).toFixed(2)} to the details below. After paying, click "I have paid".
                                 </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <div className='flex flex-col items-center justify-center gap-4 py-4'>
-                                    <Image
-                                        src={placeholderImages.placeholderImages[6].imageUrl}
-                                        alt="QR Code"
-                                        width={200}
-                                        height={200}
-                                        className="rounded-lg border p-1"
-                                        data-ai-hint={placeholderImages.placeholderImages[6].imageHint}
-                                    />
-                                    <div className='text-center'>
-                                        <p className='text-sm text-muted-foreground'>Transaction ID:</p>
-                                        <div className="flex items-center gap-2">
+                                <div className='space-y-4 rounded-lg border p-4'>
+                                    <div className='flex justify-between items-center'>
+                                        <div>
+                                            <p className='text-xs text-muted-foreground'>UPI ID</p>
+                                            <p className='font-mono font-semibold'>rockstar829092@ybl</p>
+                                        </div>
+                                        <Button size="sm" variant="ghost" onClick={() => copyToClipboard('rockstar829092@ybl', 'UPI ID')}>
+                                            <Copy className='mr-2 h-4 w-4' /> Copy
+                                        </Button>
+                                    </div>
+                                    <div className='flex justify-between items-center'>
+                                        <div>
+                                            <p className='text-xs text-muted-foreground'>Mobile Number</p>
+                                            <p className='font-mono font-semibold'>6376492883</p>
+                                        </div>
+                                         <Button size="sm" variant="ghost" onClick={() => copyToClipboard('6376492883', 'Number')}>
+                                            <Copy className='mr-2 h-4 w-4' /> Copy
+                                        </Button>
+                                    </div>
+                                    <div className='text-center pt-2'>
+                                        <p className='text-xs text-muted-foreground'>Your Transaction ID:</p>
+                                        <div className="flex items-center justify-center gap-2">
                                             <span className='font-mono text-sm font-semibold'>{transactionId}</span>
-                                            <Button size="icon" variant="ghost" className='h-7 w-7' onClick={copyTransactionId}>
+                                            <Button size="icon" variant="ghost" className='h-7 w-7' onClick={() => copyToClipboard(transactionId, 'Transaction ID')}>
                                                 <Copy className='h-4 w-4'/>
                                             </Button>
                                         </div>
