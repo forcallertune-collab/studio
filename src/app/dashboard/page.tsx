@@ -33,15 +33,15 @@ export default function DashboardPage() {
 
   return (
     <div className="grid gap-6">
-        {announcement && (
-            <Alert>
-              <Megaphone className="h-4 w-4" />
-              <AlertTitle>Announcement</AlertTitle>
-              <AlertDescription>
-                {announcement}
-              </AlertDescription>
-            </Alert>
-        )}
+      {announcement && (
+        <Alert>
+          <Megaphone className="h-4 w-4" />
+          <AlertTitle>Announcement</AlertTitle>
+          <AlertDescription>
+            {announcement}
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
