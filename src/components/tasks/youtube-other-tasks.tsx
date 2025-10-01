@@ -251,6 +251,12 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
 
   useEffect(() => {
       loadTasks();
+      // Load initial orders if local storage is empty
+      const savedOrders = localStorage.getItem('adminOrders');
+      if (!savedOrders) {
+          localStorage.setItem('adminOrders', JSON.stringify(initialOrders));
+      }
+
       window.addEventListener('storage', loadTasks);
       return () => window.removeEventListener('storage', loadTasks);
   }, [loadTasks]);

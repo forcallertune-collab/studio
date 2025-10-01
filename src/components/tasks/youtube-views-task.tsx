@@ -148,6 +148,10 @@ export default function YoutubeViewsTask() {
 
     useEffect(() => {
         loadTasks();
+        const savedOrders = localStorage.getItem('adminOrders');
+        if (!savedOrders) {
+            localStorage.setItem('adminOrders', JSON.stringify(initialOrders));
+        }
         window.addEventListener('storage', loadTasks);
         return () => window.removeEventListener('storage', loadTasks);
     }, [loadTasks]);
@@ -216,4 +220,5 @@ export default function YoutubeViewsTask() {
         </Card>
     );
 }
+
 

@@ -1,5 +1,5 @@
 
-import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket, InstagramReelTask } from './types';
+import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket, InstagramReelTask, Order } from './types';
 import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram, Download, Star } from 'lucide-react';
 
 export const advertiserServices: AdvertiserService[] = [
@@ -25,7 +25,18 @@ export const advertiserServices: AdvertiserService[] = [
 
 export const initialSupportTickets: SupportTicket[] = [];
 
-export const initialOrders = [];
+export const initialOrders: Order[] = [
+    // 9 Sample orders for all platforms
+    { id: 'SAMPLE-YT-VIEW-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'YouTube Views', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', quantity: 1000, amount: 120, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-YT-LIKE-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'YouTube Likes', link: 'https://www.youtube.com/watch?v=3JZ_D3ELwOQ', quantity: 500, amount: 60, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-YT-SUB-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'YouTube Subscribers', link: 'https://www.youtube.com/@Google', quantity: 100, amount: 120, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-YT-COMMENT-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'YouTube Comments', link: 'https://www.youtube.com/watch?v=VIDEO_ID_FOR_COMMENTS', quantity: 100, amount: 50, status: 'in progress', date: new "2024-08-01T12:00:00.000Z", progress: 0 },
+    { id: 'SAMPLE-FB-LIKE-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'Facebook Page Likes', link: 'https://www.facebook.com/facebook/', quantity: 500, amount: 400, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-FB-FOLLOW-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'Facebook Followers', link: 'https://www.facebook.com/profile.php?id=100044133318255', quantity: 500, amount: 425, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-IG-REEL-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'Instagram Reel Views', link: 'https://www.instagram.com/reels/C2Y8c8cyoX_/', quantity: 1000, amount: 80, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-APP-DOWNLOAD-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'App Downloads', link: 'https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox', quantity: 100, amount: 200, status: 'in progress', date: new Date().toISOString(), progress: 0 },
+    { id: 'SAMPLE-GOOGLE-REVIEW-1', userId: 'sample-user', user: 'Sample Advertiser', service: 'Google Reviews', link: 'https://www.google.com/maps/place/Eiffel+Tower', quantity: 50, amount: 150, status: 'in progress', date: new Date().toISOString(), progress: 0 }
+];
 
 
 export const referralChartData = [
@@ -40,3 +51,4 @@ export const referralChartData = [
   { referrals: 90, earnings: 2500 },
   { referrals: 100, earnings: 3000 },
 ]
+
