@@ -32,7 +32,7 @@ export default function WalletPage() {
     const { toast } = useToast();
 
     const generateTransactionId = () => {
-        const newTransactionId = `WETUBE-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const newTransactionId = `SOCIARA-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
         setTransactionId(newTransactionId);
     }
 

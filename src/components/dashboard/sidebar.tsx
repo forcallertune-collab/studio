@@ -87,7 +87,7 @@ export default function DashboardSidebar({ userRole }: SidebarProps) {
             <Link href="/dashboard" className="mb-4">
                <div className="flex h-9 w-9 items-center justify-center rounded-lg text-primary transition-colors md:h-8 md:w-8">
                 <Youtube className="h-6 w-6" />
-                <span className="sr-only">WeTube</span>
+                <span className="sr-only">Sociara</span>
                </div>
             </Link>
 

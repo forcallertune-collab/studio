@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Logo from "@/components/logo";
 import Image from "next/image";
@@ -19,7 +20,7 @@ export default function AboutPage() {
 
        <main className="container mx-auto py-12 px-4">
         <section className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold font-headline mb-4 text-primary">About WeTube</h1>
+            <h1 className="text-4xl md:text-5xl font-bold font-headline mb-4 text-primary">About Sociara</h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
                 Empowering individuals across India to achieve financial independence through simple, accessible social media tasks.
             </p>

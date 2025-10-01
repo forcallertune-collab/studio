@@ -50,7 +50,7 @@ export default function WelcomeDialog({ isOpen, onClose }: WelcomeDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-headline text-2xl">
             <Gift className="h-6 w-6 text-primary" />
-            Welcome to WeTube, {user.name}!
+            Welcome to Sociara, {user.name}!
           </DialogTitle>
           <DialogDescription>
             Watch videos, earn money, and enjoy with family & friends.

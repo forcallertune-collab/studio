@@ -72,7 +72,7 @@ function SignupForm() {
     
     toast({
         title: "Account Created!",
-        description: "Welcome to WeTube!"
+        description: "Welcome to Sociara!"
     });
     router.push('/dashboard');
   };

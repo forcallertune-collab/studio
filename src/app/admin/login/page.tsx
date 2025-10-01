@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
         <div className="flex justify-center mb-6 items-center gap-2 text-primary">
             <Shield className="h-8 w-8" />
             <span className="text-2xl font-bold font-headline tracking-tighter">
-                WeTube Admin
+                Sociara Admin
             </span>
         </div>
         <Card>
