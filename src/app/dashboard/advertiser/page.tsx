@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo, useContext } from "react";
+import { useState, useMemo, useContext, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,10 +27,56 @@ export default function AdvertiserPage() {
     const [serviceId, setServiceId] = useState<string | null>(null);
     const [link, setLink] = useState('');
     const [quantity, setQuantity] = useState<number | string>('');
+    const [linkError, setLinkError] = useState<string | null>(null);
+
+    const validateLink = (currentLink: string, currentPlatform: Platform | null): boolean => {
+        if (!currentLink || !currentPlatform) {
+            setLinkError(null);
+            return true; // No error if fields are not filled
+        }
+
+        let isValid = false;
+        let expectedHost = '';
+        try {
+            const url = new URL(currentLink);
+            if (currentPlatform === 'youtube') {
+                isValid = url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be');
+                expectedHost = 'youtube.com or youtu.be';
+            } else if (currentPlatform === 'facebook') {
+                isValid = url.hostname.includes('facebook.com');
+                expectedHost = 'facebook.com';
+            } else if (currentPlatform === 'instagram') {
+                isValid = url.hostname.includes('instagram.com');
+                expectedHost = 'instagram.com';
+            }
+        } catch (error) {
+            isValid = false; // Invalid URL format
+        }
+
+        if (!isValid) {
+            setLinkError(`Please enter a valid ${expectedHost} link.`);
+        } else {
+            setLinkError(null);
+        }
+        return isValid;
+    };
+    
+    useEffect(() => {
+        validateLink(link, platform);
+    }, [link, platform]);
 
     const handleCreateCampaign = (e: React.FormEvent) => {
         e.preventDefault();
         const selectedService = advertiserServices.find(s => s.id === serviceId);
+
+        if (!validateLink(link, platform)) {
+             toast({
+                title: "Invalid Link",
+                description: linkError,
+                variant: "destructive",
+            });
+            return;
+        }
 
         if (!selectedService || !user || !setUser) return;
         
@@ -72,7 +118,7 @@ export default function AdvertiserPage() {
         const newOrder = {
             id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
             user: user.name,
-            service: selectedService.name, // Use the proper service name
+            service: selectedService.serviceName, // Use the proper service name
             link: link,
             quantity: Number(quantity),
             amount: totalCost,
@@ -121,6 +167,7 @@ export default function AdvertiserPage() {
         setPlatform(value as Platform);
         setServiceId(null);
         setQuantity('');
+        setLink(''); // Reset link when platform changes
     }
 
     const handleServiceChange = (value: string) => {
@@ -184,6 +231,7 @@ export default function AdvertiserPage() {
                             <div>
                                 <Label htmlFor="campaignUrl">Link</Label>
                                 <Input id="campaignUrl" placeholder="https://..." value={link} onChange={e => setLink(e.target.value)} disabled={!serviceId} />
+                                {linkError && <p className="text-sm text-destructive mt-1">{linkError}</p>}
                             </div>
 
                             <div>
@@ -244,7 +292,7 @@ export default function AdvertiserPage() {
                     </div>
                 </CardContent>
                 <CardContent>
-                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !quantity || totalCost > walletBalance || totalCost <= 0}>
+                   <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={!platform || !serviceId || !link || !!linkError || !quantity || totalCost > walletBalance || totalCost <= 0}>
                      {totalCost > walletBalance ? 'Insufficient Funds' : 'Place Order'}
                    </Button>
                 </CardContent>
@@ -252,3 +300,5 @@ export default function AdvertiserPage() {
         </Card>
     );
 }
+
+    
