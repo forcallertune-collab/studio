@@ -2,7 +2,7 @@
 
 export type Transaction = {
   id: string;
-  type: 'recharge' | 'withdrawal' | 'task_earning';
+  type: 'recharge' | 'withdrawal' | 'task_earning' | 'order_placed';
   amount: number;
   status: 'pending' | 'approved' | 'rejected' | 'completed';
   date: string;
@@ -21,6 +21,20 @@ export type User = {
   avatarUrl?: string;
   transactions?: Transaction[];
 };
+
+export type Order = {
+    id: string;
+    userId: string;
+    user: string;
+    service: string;
+    link: string;
+    quantity: number;
+    amount: number;
+    status: 'completed' | 'processing' | 'pending' | 'failed' | 'cancelled' | 'in progress';
+    date: string;
+    progress: number; // Percentage from 0 to 100
+};
+
 
 export type VideoTask = {
   id: string;
