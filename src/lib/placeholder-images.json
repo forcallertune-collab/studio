@@ -39,8 +39,8 @@
     {
       "id": "qr-code",
       "description": "A placeholder QR code for payments.",
-      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=example@upi",
-      "imageHint": "qr code"
+      "imageUrl": "https://storage.googleapis.com/project-os-prod-public/e913a48e-f14a-4467-850f-244b150937a0",
+      "imageHint": "payment qr code"
     }
   ]
 }
