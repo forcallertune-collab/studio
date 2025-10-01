@@ -79,7 +79,14 @@ export type AppDownloadTask = {
   reward: number;
 };
 
-export type Platform = 'youtube' | 'facebook' | 'instagram' | 'app';
+export type GoogleReviewTask = {
+  id: string;
+  businessName: string;
+  url: string;
+  reward: number;
+};
+
+export type Platform = 'youtube' | 'facebook' | 'instagram' | 'app' | 'google';
 
 export type AdvertiserService = {
   id: string;

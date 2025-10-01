@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { advertiserServices, initialOrders } from "@/lib/data";
 import type { Platform, Transaction } from "@/lib/types";
-import { Rocket, Youtube, Facebook, Instagram, Wallet, Download } from "lucide-react";
+import { Rocket, Youtube, Facebook, Instagram, Wallet, Download, Star } from "lucide-react";
 import { WalletContext, UserContext } from "../layout";
 
 const platformIcons: { [key in Platform]: JSX.Element } = {
@@ -18,6 +18,7 @@ const platformIcons: { [key in Platform]: JSX.Element } = {
     facebook: <Facebook className="h-5 w-5" />,
     instagram: <Instagram className="h-5 w-5" />,
     app: <Download className="h-5 w-5" />,
+    google: <Star className="h-5 w-5" />,
 }
 
 export default function AdvertiserPage() {
@@ -52,6 +53,9 @@ export default function AdvertiserPage() {
             } else if (currentPlatform === 'app') {
                 isValid = url.hostname.includes('play.google.com') || url.hostname.includes('apps.apple.com');
                 expectedHost = 'play.google.com or apps.apple.com';
+            } else if (currentPlatform === 'google') {
+                isValid = url.hostname.includes('google.com');
+                expectedHost = 'google.com';
             }
         } catch (error) {
             isValid = false; // Invalid URL format
@@ -215,6 +219,7 @@ export default function AdvertiserPage() {
                                         <SelectItem value="facebook">Facebook</SelectItem>
                                         <SelectItem value="instagram">Instagram</SelectItem>
                                         <SelectItem value="app">App Downloads</SelectItem>
+                                        <SelectItem value="google">Google Reviews</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

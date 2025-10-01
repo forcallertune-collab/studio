@@ -1,6 +1,6 @@
 
 import type { User, VideoTask, SubscriptionTask, LikeTask, CommentTask, AdvertiserService, FacebookLikeTask, FacebookFollowTask, SupportTicket, InstagramReelTask } from './types';
-import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram, Download } from 'lucide-react';
+import { Eye, ThumbsUp, UserPlus, MessageSquare, Rocket, Facebook, Instagram, Download, Star } from 'lucide-react';
 
 export const dummyUser: User = {
   userId: 'dummy-user-01',
@@ -31,6 +31,8 @@ export const advertiserServices: AdvertiserService[] = [
   { id: 'ig-views', serviceName: 'Instagram Reel Views', platform: 'instagram', name: 'Video/Reel Views', price: 80, unit: 'per 1k', icon: Eye, min: 1000, max: 2000000 },
   // App Downloads
   { id: 'app-downloads', serviceName: 'App Downloads', platform: 'app', name: 'App Downloads', price: 2000, unit: 'per 1k', icon: Download, min: 100, max: 10000 },
+  // Google Reviews
+  { id: 'google-reviews', serviceName: 'Google Reviews', platform: 'google', name: 'Google Reviews', price: 3000, unit: 'per 1k', icon: Star, min: 50, max: 5000 },
 ];
 
 export const referralChartData = [
