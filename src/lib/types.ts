@@ -91,3 +91,13 @@ export type PaymentRequest = {
     status: 'pending' | 'approved' | 'rejected';
     date: string;
 }
+
+export type WithdrawalRequest = {
+    id: string;
+    userId: string;
+    userEmail: string;
+    amount: number;
+    upiId: string;
+    status: 'pending' | 'approved' | 'rejected';
+    date: string;
+};

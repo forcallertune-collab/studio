@@ -4,7 +4,7 @@
 import { useContext, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Wallet, BadgeIndianRupee, History, Copy } from "lucide-react";
+import { Wallet, BadgeIndianRupee, History, Copy, Upload } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,14 +22,22 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { WalletContext, UserContext } from '../layout';
 import placeholderImages from '@/lib/placeholder-images.json';
-import type { PaymentRequest } from '@/lib/types';
+import type { PaymentRequest, WithdrawalRequest } from '@/lib/types';
+import Link from 'next/link';
 
 export default function WalletPage() {
-    const { walletBalance } = useContext(WalletContext);
+    const { walletBalance, setWalletBalance } = useContext(WalletContext);
     const { user } = useContext(UserContext);
+    const { toast } = useToast();
+    
+    // Recharge state
     const [rechargeAmount, setRechargeAmount] = useState<number | string>('');
     const [transactionId, setTransactionId] = useState('');
-    const { toast } = useToast();
+
+    // Withdrawal state
+    const [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
+    const [isWithdrawalDialog, setIsWithdrawalDialog] = useState(false);
+
 
     const generateTransactionId = () => {
         const newTransactionId = `SOCIARA-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
@@ -69,7 +77,7 @@ export default function WalletPage() {
 
         const newRequest: PaymentRequest = {
             id: transactionId,
-            userId: user.userId, // Use the stable userId of the logged-in user from context
+            userId: user.userId,
             userEmail: user.email,
             amount,
             status: 'pending',
@@ -88,88 +96,187 @@ export default function WalletPage() {
         setTransactionId('');
     }
 
+    const handleWithdrawalRequest = () => {
+        if (!user || !user.userId) {
+            toast({ title: 'Error', description: 'You must be logged in.', variant: 'destructive' });
+            return;
+        }
+        
+        const amount = Number(withdrawalAmount);
+        if (amount <= 0) {
+            toast({ title: 'Invalid Amount', description: 'Please enter a valid amount to withdraw.', variant: 'destructive' });
+            return;
+        }
+
+        if (amount > walletBalance) {
+            toast({ title: 'Insufficient Balance', description: 'You cannot withdraw more than your available balance.', variant: 'destructive' });
+            return;
+        }
+         if (!user.upiId) {
+            toast({ title: 'UPI ID Missing', description: <>Please add your UPI ID in your <Link href="/dashboard/profile" className="underline">profile</Link> before withdrawing.</>, variant: 'destructive' });
+            return;
+        }
+
+        // Deduct from balance and create request
+        setWalletBalance(prev => prev - amount);
+
+        const withdrawalRequests: WithdrawalRequest[] = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        const newRequest: WithdrawalRequest = {
+            id: `WTH-${Date.now()}`,
+            userId: user.userId,
+            userEmail: user.email,
+            amount: amount,
+            upiId: user.upiId,
+            status: 'pending',
+            date: new Date().toISOString(),
+        };
+
+        withdrawalRequests.push(newRequest);
+        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
+
+        toast({
+            title: 'Withdrawal Request Submitted',
+            description: `Your request to withdraw ₹${amount.toFixed(2)} is pending and will be processed within 2 hours.`,
+        });
+
+        setIsWithdrawalDialog(false);
+        setWithdrawalAmount('');
+    };
+
+
     return (
-        <div className="grid gap-6">
+        <div className="grid gap-8">
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl flex items-center gap-2"><Wallet/> My Wallet</CardTitle>
-                    <CardDescription>View your balance, recharge your account, and see your transaction history.</CardDescription>
+                    <CardDescription>View your balance, add funds, withdraw earnings, and see transaction history.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent>
                     {/* Balance Display */}
                     <div className="text-center p-6 bg-primary/10 rounded-lg">
                         <p className="text-sm font-medium text-muted-foreground">CURRENT BALANCE</p>
                         <p className="text-5xl font-bold font-headline text-primary mt-2">₹{walletBalance.toFixed(2)}</p>
                     </div>
+                </CardContent>
+            </Card>
 
-                    {/* Recharge Section */}
-                    <Card className="bg-muted/30">
-                        <CardHeader>
-                            <CardTitle className="font-headline flex items-center gap-2 text-xl"><BadgeIndianRupee /> Recharge Wallet</CardTitle>
-                            <CardDescription>Add funds to your wallet to purchase services.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col sm:flex-row items-end gap-4">
-                            <div className="flex-1 w-full">
-                                <Label htmlFor="amount">Amount (₹)</Label>
-                                <Input 
-                                    id="amount" 
-                                    type="number" 
-                                    placeholder="Enter amount" 
-                                    value={rechargeAmount}
-                                    onChange={(e) => setRechargeAmount(e.target.value)}
-                                    min="1"
-                                />
-                            </div>
-                            <AlertDialog onOpenChange={(open) => open && generateTransactionId()}>
-                                <AlertDialogTrigger asChild>
-                                    <Button className="w-full sm:w-auto" disabled={!rechargeAmount || Number(rechargeAmount) <= 0}>
-                                        Proceed to Add Funds
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                    <AlertDialogTitle>Scan to Pay</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)} to your wallet. After paying, click "I have paid".
-                                    </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <div className='flex flex-col items-center justify-center gap-4 py-4'>
-                                        <Image
-                                            src={placeholderImages.placeholderImages[6].imageUrl}
-                                            alt="QR Code"
-                                            width={200}
-                                            height={200}
-                                            className="rounded-lg border p-1"
-                                            data-ai-hint={placeholderImages.placeholderImages[6].imageHint}
-                                        />
-                                        <div className='text-center'>
-                                            <p className='text-sm text-muted-foreground'>Transaction ID:</p>
-                                            <div className="flex items-center gap-2">
-                                                <span className='font-mono text-sm font-semibold'>{transactionId}</span>
-                                                <Button size="icon" variant="ghost" className='h-7 w-7' onClick={copyTransactionId}>
-                                                    <Copy className='h-4 w-4'/>
-                                                </Button>
-                                            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+                {/* Recharge Section */}
+                <Card className="bg-muted/30">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2 text-xl"><BadgeIndianRupee /> Recharge Wallet</CardTitle>
+                        <CardDescription>Add funds to your wallet via UPI to purchase services.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col sm:flex-row items-end gap-4">
+                        <div className="flex-1 w-full">
+                            <Label htmlFor="amount">Amount (₹)</Label>
+                            <Input 
+                                id="amount" 
+                                type="number" 
+                                placeholder="Enter amount" 
+                                value={rechargeAmount}
+                                onChange={(e) => setRechargeAmount(e.target.value)}
+                                min="1"
+                            />
+                        </div>
+                        <AlertDialog onOpenChange={(open) => open && generateTransactionId()}>
+                            <AlertDialogTrigger asChild>
+                                <Button className="w-full sm:w-auto" disabled={!rechargeAmount || Number(rechargeAmount) <= 0}>
+                                    Add Funds
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Scan to Pay</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Scan the QR code with your payment app to add ₹{Number(rechargeAmount).toFixed(2)}. After paying, click "I have paid".
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className='flex flex-col items-center justify-center gap-4 py-4'>
+                                    <Image
+                                        src="https://firebasestorage.googleapis.com/v0/b/project-os-prod.appspot.com/o/public%2Fe913a48e-f14a-4467-850f-244b150937a0?alt=media&token=894d509f-b481-4340-951b-53c233157f13"
+                                        alt="QR Code"
+                                        width={200}
+                                        height={200}
+                                        className="rounded-lg border p-1"
+                                        data-ai-hint="payment qr code"
+                                    />
+                                    <div className='text-center'>
+                                        <p className='text-sm text-muted-foreground'>Transaction ID:</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className='font-mono text-sm font-semibold'>{transactionId}</span>
+                                            <Button size="icon" variant="ghost" className='h-7 w-7' onClick={copyTransactionId}>
+                                                <Copy className='h-4 w-4'/>
+                                            </Button>
                                         </div>
                                     </div>
-                                    <AlertDialogFooter>
-                                    <AlertDialogCancel onClick={() => setTransactionId('')}>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handlePaymentRequest}>I have paid</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </CardContent>
-                    </Card>
+                                </div>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setTransactionId('')}>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handlePaymentRequest}>I have paid</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </CardContent>
+                </Card>
 
-                    {/* Transaction History */}
-                     <div>
-                        <h3 className="font-headline text-xl mb-4 flex items-center gap-2"><History /> Transaction History</h3>
-                        <div className="text-center py-12 bg-muted/50 rounded-lg">
-                            <p className="text-muted-foreground">No transactions yet.</p>
-                            <p className="text-sm text-muted-foreground">Your transaction history will appear here.</p>
+                 {/* Withdrawal Section */}
+                <Card className="bg-muted/30">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2 text-xl"><Upload /> Withdraw Earnings</CardTitle>
+                        <CardDescription>Request a payout of your available balance to your UPI.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col sm:flex-row items-end gap-4">
+                        <div className="flex-1 w-full">
+                            <Label htmlFor="withdrawal-amount">Amount (₹)</Label>
+                            <Input 
+                                id="withdrawal-amount" 
+                                type="number" 
+                                placeholder="Enter amount"
+                                value={withdrawalAmount}
+                                onChange={(e) => setWithdrawalAmount(e.target.value)}
+                                min="1"
+                                max={walletBalance}
+                            />
                         </div>
-                    </div>
+                        <AlertDialog open={isWithdrawalDialog} onOpenChange={setIsWithdrawalDialog}>
+                            <AlertDialogTrigger asChild>
+                                <Button 
+                                    className="w-full sm:w-auto" 
+                                    variant="outline"
+                                    disabled={!withdrawalAmount || Number(withdrawalAmount) <= 0 || Number(withdrawalAmount) > walletBalance}
+                                >
+                                    Request Withdrawal
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirm Withdrawal</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        You are about to request a withdrawal of <span className="font-bold text-foreground">₹{Number(withdrawalAmount).toFixed(2)}</span> to your UPI ID: <span className="font-mono text-foreground">{user?.upiId || 'Not Set'}</span>.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <p className="text-sm text-muted-foreground">The amount will be deducted from your wallet and is subject to admin approval within 2 hours.</p>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleWithdrawalRequest}>Confirm & Withdraw</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </CardContent>
+                </Card>
+            </div>
 
+            {/* Transaction History */}
+            <Card>
+                <CardHeader>
+                    <h3 className="font-headline text-xl mb-4 flex items-center gap-2"><History /> Transaction History</h3>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-center py-12 bg-muted/50 rounded-lg">
+                        <p className="text-muted-foreground">No transactions yet.</p>
+                        <p className="text-sm text-muted-foreground">Your transaction history will appear here.</p>
+                    </div>
                 </CardContent>
             </Card>
         </div>
