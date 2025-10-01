@@ -16,6 +16,7 @@ export type User = {
   password?: string; // Should be hashed in a real app
   role: 'earner' | 'advertiser' | 'both';
   referralCode: string;
+  referredBy?: string;
   walletBalance: number;
   upiId?: string;
   avatarUrl?: string;

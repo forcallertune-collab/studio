@@ -65,6 +65,7 @@ function SignupForm() {
         upiId: signupUpiId,
         role: role,
         referralCode: `${signupName.split(' ')[0].toUpperCase()}${new Date().getFullYear()}`,
+        referredBy: signupReferral || undefined,
         walletBalance: 0.00,
         transactions: [],
     };
