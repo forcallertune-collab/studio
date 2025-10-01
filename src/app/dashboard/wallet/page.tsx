@@ -37,16 +37,12 @@ export default function WalletPage() {
     // Recharge state
     const [rechargeAmount, setRechargeAmount] = useState<number | string>('');
     const [transactionId, setTransactionId] = useState('');
+    const [isRechargeDialogOpen, setIsRechargeDialogOpen] = useState(false);
 
     // Withdrawal state
     const [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
     const [isWithdrawalDialog, setIsWithdrawalDialog] = useState(false);
 
-
-    const generateTransactionId = () => {
-        const newTransactionId = `SOCIARA-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-        setTransactionId(newTransactionId);
-    }
 
     const copyToClipboard = (text: string, subject: string) => {
         navigator.clipboard.writeText(text);
@@ -69,7 +65,7 @@ export default function WalletPage() {
         if (amount <= 0 || !transactionId) {
             toast({
                 title: 'Invalid Request',
-                description: 'Please enter a valid amount and generate a transaction ID.',
+                description: 'Please enter a valid amount and transaction ID.',
                 variant: 'destructive',
             });
             return;
@@ -95,8 +91,10 @@ export default function WalletPage() {
             description: 'Your payment is being processed. Please wait for admin approval.',
         });
         
+        // Reset and close
         setRechargeAmount('');
         setTransactionId('');
+        setIsRechargeDialogOpen(false);
     }
 
     const handleWithdrawalRequest = () => {
@@ -206,7 +204,7 @@ export default function WalletPage() {
                                 min="1"
                             />
                         </div>
-                        <AlertDialog onOpenChange={(open) => open && generateTransactionId()}>
+                        <AlertDialog open={isRechargeDialogOpen} onOpenChange={setIsRechargeDialogOpen}>
                             <AlertDialogTrigger asChild>
                                 <Button className="w-full sm:w-auto" disabled={!rechargeAmount || Number(rechargeAmount) <= 0}>
                                     Add Funds
@@ -216,7 +214,7 @@ export default function WalletPage() {
                                 <AlertDialogHeader>
                                 <AlertDialogTitle>Complete Your Payment</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Pay ₹{Number(rechargeAmount).toFixed(2)} to the details below. After paying, click "I have paid".
+                                    Pay ₹{Number(rechargeAmount).toFixed(2)} to the details below. After paying, enter the Transaction ID and click "I have paid".
                                 </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <div className='space-y-4 rounded-lg border p-4'>
@@ -238,19 +236,20 @@ export default function WalletPage() {
                                             <Copy className='mr-2 h-4 w-4' /> Copy
                                         </Button>
                                     </div>
-                                    <div className='text-center pt-2'>
-                                        <p className='text-xs text-muted-foreground'>Your Transaction ID:</p>
-                                        <div className="flex items-center justify-center gap-2">
-                                            <span className='font-mono text-sm font-semibold'>{transactionId}</span>
-                                            <Button size="icon" variant="ghost" className='h-7 w-7' onClick={() => copyToClipboard(transactionId, 'Transaction ID')}>
-                                                <Copy className='h-4 w-4'/>
-                                            </Button>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div>
+                                    <Label htmlFor="transaction-id" className="font-semibold">Payment Transaction ID</Label>
+                                    <Input 
+                                        id="transaction-id" 
+                                        placeholder="Enter the transaction ID from your UPI app"
+                                        value={transactionId}
+                                        onChange={(e) => setTransactionId(e.target.value)}
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-1">This is required to verify your payment.</p>
                                 </div>
                                 <AlertDialogFooter>
                                 <AlertDialogCancel onClick={() => setTransactionId('')}>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handlePaymentRequest}>I have paid</AlertDialogAction>
+                                <AlertDialogAction onClick={handlePaymentRequest} disabled={!transactionId}>I have paid</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>

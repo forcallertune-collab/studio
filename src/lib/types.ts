@@ -122,7 +122,7 @@ export type SupportTicket = {
 };
 
 export type PaymentRequest = {
-    id: string;
+    id: string; // This will now be the user-provided transaction ID
     userId: string; // Use the stable userId instead of email
     userEmail: string;
     amount: number;
