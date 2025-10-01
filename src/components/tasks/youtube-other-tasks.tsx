@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { moderateYouTubeComments } from '@/ai/flows/moderate-youtube-comments';
 import YouTube, { YouTubePlayer } from 'react-youtube';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
+import { initialOrders } from '@/lib/data';
 
 type TaskType = 'like' | 'subscribe' | 'comment';
 
@@ -216,7 +217,7 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
 
   const loadTasks = useCallback(() => {
       const savedOrders = localStorage.getItem('adminOrders');
-      const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
+      const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : initialOrders;
 
       const dynamicTasks: Task[] = orders
           .filter((order) => order.service === config.serviceName && order.status === 'in progress')

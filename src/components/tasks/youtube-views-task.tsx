@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { CheckCircle } from 'lucide-react';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 import type { Order, VideoTask } from '@/lib/types';
+import { initialOrders } from '@/lib/data';
 
 const VIDEO_DURATION = 30; // seconds
 
@@ -131,7 +132,7 @@ export default function YoutubeViewsTask() {
 
     const loadTasks = useCallback(() => {
         const savedOrders = localStorage.getItem('adminOrders');
-        const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
+        const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : initialOrders;
 
         const viewTasks: VideoTask[] = orders
             .filter((order) => order.service === 'YouTube Views' && order.status === 'in progress')
@@ -176,7 +177,7 @@ export default function YoutubeViewsTask() {
             <CardHeader>
                 <CardTitle>Watch Videos & Earn</CardTitle>
                 <CardDescription>Watch each video for 30 seconds to earn ₹0.75. Click on any video below to start.</CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {tasks.map(task => {
