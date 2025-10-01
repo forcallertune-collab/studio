@@ -39,7 +39,7 @@
     {
       "id": "qr-code",
       "description": "A placeholder QR code for payments.",
-      "imageUrl": "https://storage.googleapis.com/project-os-prod-public/7e03c200-a75e-4171-872f-51307b691a24",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9990597607@paytm",
       "imageHint": "payment qr code"
     }
   ]
