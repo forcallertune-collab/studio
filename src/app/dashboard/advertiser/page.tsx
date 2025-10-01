@@ -164,7 +164,7 @@ export default function AdvertiserPage() {
 
         toast({
             title: "Order Placed!",
-            description: `₹${totalCost.toFixed(2)} has been deducted. Your campaign is now live.`,
+            description: `Your campaign is live and progress updates may take up to 24 hours to appear.`,
         });
         
         // Reset form
