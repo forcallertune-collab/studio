@@ -26,3 +26,17 @@ export const advertiserServices: AdvertiserService[] = [
 export const initialSupportTickets: SupportTicket[] = [];
 
 export const initialOrders = [];
+
+
+export const referralChartData = [
+  { referrals: 10, earnings: 150 },
+  { referrals: 20, earnings: 350 },
+  { referrals: 30, earnings: 600 },
+  { referrals: 40, earnings: 800 },
+  { referrals: 50, earnings: 1200 },
+  { referrals: 60, earnings: 1500 },
+  { referrals: 70, earnings: 1800 },
+  { referrals: 80, earnings: 2200 },
+  { referrals: 90, earnings: 2500 },
+  { referrals: 100, earnings: 3000 },
+]
