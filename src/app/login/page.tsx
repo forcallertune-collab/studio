@@ -143,13 +143,26 @@ function SignupForm() {
   );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+  
+  const [activeTab, setActiveTab] = useState('login');
   
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  useEffect(() => {
+    // If a referral code is in the URL, switch to the signup tab
+    if (searchParams.has('ref')) {
+      setActiveTab('signup');
+    }
+    // Always clear login fields on component mount to avoid showing stale data
+    setLoginEmail('');
+    setLoginPassword('');
+  }, [searchParams]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,7 +170,7 @@ export default function LoginPage() {
     const user = Object.values(users).find((u: any) => u.email === loginEmail && u.password === loginPassword) as User | undefined;
 
     if (user) {
-      localStorage.setItem('loggedInUserId', user.userId); // Save userId instead of email
+      localStorage.setItem('loggedInUserId', user.userId);
       localStorage.setItem('welcomeShown', 'false');
       router.push('/dashboard');
     } else {
@@ -182,7 +195,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-6">
           <Logo />
         </div>
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login"><Users className="mr-2 h-4 w-4" />Login</TabsTrigger>
             <TabsTrigger value="signup"><UserPlus className="mr-2 h-4 w-4" />Sign Up</TabsTrigger>
@@ -215,12 +228,19 @@ export default function LoginPage() {
           </TabsContent>
           
           <TabsContent value="signup">
-            <Suspense fallback={<div>Loading...</div>}>
-              <SignupForm />
-            </Suspense>
+            <SignupForm />
           </TabsContent>
         </Tabs>
       </div>
     </main>
+  );
+}
+
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
