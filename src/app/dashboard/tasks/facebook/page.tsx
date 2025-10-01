@@ -1,8 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Facebook } from "lucide-react";
 import FacebookTasks from "@/components/tasks/facebook-tasks";
-import { facebookLikeTasks, facebookFollowTasks } from "@/lib/data";
 
 export default function FacebookTasksPage() {
     return (
@@ -18,10 +18,10 @@ export default function FacebookTasksPage() {
                         <TabsTrigger value="follows">Follows</TabsTrigger>
                     </TabsList>
                     <TabsContent value="likes" className="mt-4">
-                        <FacebookTasks type="like" tasks={facebookLikeTasks} />
+                        <FacebookTasks type="like" />
                     </TabsContent>
                     <TabsContent value="follows" className="mt-4">
-                        <FacebookTasks type="follow" tasks={facebookFollowTasks} />
+                        <FacebookTasks type="follow" />
                     </TabsContent>
                 </Tabs>
             </CardContent>

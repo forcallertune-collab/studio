@@ -1,23 +1,60 @@
 
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import type { InstagramReelTask } from '@/lib/types';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Video, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { initialOrders } from '@/lib/data';
 
-type InstagramReelsTasksProps = {
-  tasks: InstagramReelTask[];
-};
+const REWARD = 0.75;
+const SERVICE_NAME = 'Instagram Reel Views';
 
-export default function InstagramReelsTask({ tasks }: InstagramReelsTasksProps) {
+export default function InstagramReelsTask() {
+  const [tasks, setTasks] = useState<InstagramReelTask[]>([]);
+
+  const loadTasks = useCallback(() => {
+    const savedOrders = localStorage.getItem('adminOrders');
+    const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+
+    const dynamicTasks: InstagramReelTask[] = orders
+      .filter((order: any) => order.service === SERVICE_NAME && order.status === 'in progress')
+      .map((order: any) => ({
+        id: order.id,
+        url: order.link,
+        reward: REWARD,
+        reelTitle: `Reel from ${order.user}`, // Placeholder name
+      }));
+    
+    setTasks(dynamicTasks);
+  }, []);
+
+  useEffect(() => {
+    loadTasks();
+    window.addEventListener('storage', loadTasks);
+    return () => window.removeEventListener('storage', loadTasks);
+  }, [loadTasks]);
+
+  if (tasks.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Watch Reels & Earn</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12 bg-muted/50 rounded-lg">
+            <p className="text-muted-foreground">No Reel tasks available right now.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Video /> Watch Reels
-        </CardTitle>
+        <CardTitle>Watch Reels</CardTitle>
         <CardDescription>Watch these Reels to earn money. Click on any video below to go to Instagram.</CardDescription>
       </CardHeader>
       <CardContent>

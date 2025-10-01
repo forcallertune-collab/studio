@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import YoutubeViewsTask from "@/components/tasks/youtube-views-task";
 import YoutubeOtherTasks from "@/components/tasks/youtube-other-tasks";
-import { youtubeSubscribeTasks, youtubeLikeTasks, youtubeCommentTasks } from "@/lib/data";
 
 export default function YouTubeTasksPage() {
     return (
@@ -26,13 +25,13 @@ export default function YouTubeTasksPage() {
                         <YoutubeViewsTask />
                     </TabsContent>
                     <TabsContent value="likes" className="mt-4">
-                        <YoutubeOtherTasks type="like" tasks={youtubeLikeTasks} />
+                        <YoutubeOtherTasks type="like" />
                     </TabsContent>
                     <TabsContent value="subscribes" className="mt-4">
-                        <YoutubeOtherTasks type="subscribe" tasks={youtubeSubscribeTasks} />
+                        <YoutubeOtherTasks type="subscribe" />
                     </TabsContent>
                     <TabsContent value="comments" className="mt-4">
-                        <YoutubeOtherTasks type="comment" tasks={youtubeCommentTasks} />
+                        <YoutubeOtherTasks type="comment" />
                     </TabsContent>
                 </Tabs>
             </CardContent>

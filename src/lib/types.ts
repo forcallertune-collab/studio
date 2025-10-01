@@ -68,6 +68,7 @@ export type AdvertiserService = {
   id: string;
   platform: Platform;
   name: string;
+  serviceName: string; // Add a more descriptive service name
   price: number; // Price per 1000
   unit: string;
   icon: React.ElementType;

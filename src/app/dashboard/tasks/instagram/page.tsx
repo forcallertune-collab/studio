@@ -1,8 +1,9 @@
 
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Instagram } from "lucide-react";
 import InstagramReelsTask from "@/components/tasks/instagram-reels-task";
-import { instagramReelTasks } from "@/lib/data";
 
 export default function InstagramTasksPage() {
     return (
@@ -12,7 +13,7 @@ export default function InstagramTasksPage() {
                 <CardDescription>Get ready to earn by completing Instagram tasks!</CardDescription>
             </CardHeader>
             <CardContent>
-                <InstagramReelsTask tasks={instagramReelTasks} />
+                <InstagramReelsTask />
             </CardContent>
         </Card>
     );

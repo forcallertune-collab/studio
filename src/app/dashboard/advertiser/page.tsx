@@ -53,11 +53,11 @@ export default function AdvertiserPage() {
         const newOrder = {
             id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
             user: user.name,
-            service: selectedService.name,
-            link: link, // Save the link
-            quantity: Number(quantity), // Save the quantity
+            service: selectedService.serviceName,
+            link: link,
+            quantity: Number(quantity),
             amount: totalCost,
-            status: 'in progress' as const, // Set status to 'in progress'
+            status: 'in progress' as const,
             date: new Date().toISOString().split('T')[0],
         };
 

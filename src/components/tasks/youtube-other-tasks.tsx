@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { LikeTask, SubscriptionTask, CommentTask } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { moderateYouTubeComments } from '@/ai/flows/moderate-youtube-comments';
+import { initialOrders } from '@/lib/data';
 
 type TaskType = 'like' | 'subscribe' | 'comment';
 
@@ -26,7 +27,6 @@ type Task = LikeTask | SubscriptionTask | CommentTask;
 
 type YoutubeOtherTasksProps = {
   type: TaskType;
-  tasks: Task[];
 };
 
 const typeConfig = {
@@ -35,18 +35,24 @@ const typeConfig = {
     description: 'Like these videos to earn ₹0.50 per like.',
     icon: ThumbsUp,
     actionText: 'Like Video',
+    serviceName: 'YouTube Likes',
+    reward: 0.50,
   },
   subscribe: {
     title: 'Subscribe to Channels',
     description: 'Subscribe to these channels to earn ₹1.00 per subscription.',
     icon: UserPlus,
     actionText: 'Subscribe',
+    serviceName: 'YouTube Subscribers',
+    reward: 1.00,
   },
   comment: {
     title: 'Comment on Videos',
     description: 'Post an approved comment on these videos to earn ₹0.50.',
     icon: MessageSquare,
     actionText: 'Add Comment',
+    serviceName: 'YouTube Comments',
+    reward: 0.50,
   },
 };
 
@@ -176,8 +182,67 @@ const CommentDialog = ({ task }: { task: CommentTask }) => {
 };
 
 
-export default function YoutubeOtherTasks({ type, tasks }: YoutubeOtherTasksProps) {
+export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
   const config = typeConfig[type];
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+
+  const loadTasks = useCallback(() => {
+      const savedOrders = localStorage.getItem('adminOrders');
+      const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+
+      const dynamicTasks: Task[] = orders
+          .filter((order: any) => order.service === config.serviceName && order.status === 'in progress')
+          .map((order: any) => {
+              const baseTask = {
+                  id: order.id,
+                  url: order.link,
+                  reward: config.reward,
+              };
+              if (type === 'subscribe') {
+                  return {
+                      ...baseTask,
+                      channelName: `Channel from ${order.user}`, // Placeholder
+                  } as SubscriptionTask;
+              } else if (type === 'like') {
+                  return {
+                      ...baseTask,
+                      videoTitle: `Video from ${order.user}`, // Placeholder
+                  } as LikeTask;
+              } else { // comment
+                   return {
+                      ...baseTask,
+                      videoTitle: `Video from ${order.user}`, // Placeholder
+                      templates: ["Great video!", "Nice content!", "Awesome!"], // Default templates
+                  } as CommentTask;
+              }
+          });
+      
+      setTasks(dynamicTasks);
+  }, [config.serviceName, config.reward, type]);
+
+  useEffect(() => {
+      loadTasks();
+      window.addEventListener('storage', loadTasks);
+      return () => window.removeEventListener('storage', loadTasks);
+  }, [loadTasks]);
+
+  if (tasks.length === 0) {
+      return (
+          <Card>
+              <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                      <config.icon /> {config.title}
+                  </CardTitle>
+              </CardHeader>
+              <CardContent>
+                  <div className="text-center py-12 bg-muted/50 rounded-lg">
+                      <p className="text-muted-foreground">No {type} tasks available right now.</p>
+                  </div>
+              </CardContent>
+          </Card>
+      );
+  }
 
   return (
     <Card>
@@ -190,7 +255,7 @@ export default function YoutubeOtherTasks({ type, tasks }: YoutubeOtherTasksProp
       <CardContent>
         <div className="border rounded-lg">
           <div className="divide-y">
-            {tasks.slice(0, 10).map((task) => ( // Show first 10 for demo
+            {tasks.map((task) => (
               <div key={task.id} className="p-3 flex items-center justify-between">
                 <div>
                   <p className="font-semibold">
