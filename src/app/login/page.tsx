@@ -31,13 +31,12 @@ function SignupForm() {
   const [role, setRole] = useState<'earner' | 'advertiser' | 'both'>('earner');
 
   useEffect(() => {
-    // Reset all fields on component mount
+    // Reset all fields on component mount/remount, except for the referral code.
     setSignupName('');
     setSignupEmail('');
     setSignupPassword('');
     setSignupUpiId('');
     
-    // Only set the referral code from URL params
     const refCode = searchParams.get('ref');
     if (refCode) {
       setSignupReferral(refCode);
@@ -164,11 +163,11 @@ function LoginPageContent() {
   const [loginPassword, setLoginPassword] = useState('');
 
   useEffect(() => {
-    // Always clear login fields on component mount to avoid showing stale data
+    // ALWAYS clear login fields on component mount/remount to avoid showing stale data.
     setLoginEmail('');
     setLoginPassword('');
     
-    // If a referral code is in the URL, switch to the signup tab
+    // If a referral code is in the URL, switch to the signup tab. Otherwise, default to login.
     if (searchParams.has('ref')) {
       setActiveTab('signup');
     } else {
