@@ -46,70 +46,61 @@ export default function AdminOrdersPage() {
     }, []);
 
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-        setOrders(currentOrders => {
-            const orderToUpdate = currentOrders.find(order => order.id === orderId);
-            if (!orderToUpdate) return currentOrders;
+        let updatedOrders = [...orders];
+        const orderIndex = updatedOrders.findIndex(order => order.id === orderId);
+        if (orderIndex === -1) return;
 
-            let updatedOrders = currentOrders.map(order =>
-                order.id === orderId ? { ...order, status: newStatus } : order
-            );
+        const orderToUpdate = updatedOrders[orderIndex];
 
-            if (newStatus === 'cancelled' && orderToUpdate.status !== 'cancelled') {
-                // Refund logic
-                const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
-                const userToUpdate = allUsers[orderToUpdate.userId];
+        // Only process refund if status is changing TO cancelled from something else
+        if (newStatus === 'cancelled' && orderToUpdate.status !== 'cancelled') {
+            const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
+            const userToUpdate = allUsers[orderToUpdate.userId];
 
-                if (userToUpdate) {
-                    userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + orderToUpdate.amount;
-
-                    const refundTransaction: Transaction = {
-                        id: `REFUND-${Date.now()}`,
-                        type: 'recharge', // Using 'recharge' type to credit the wallet
-                        amount: orderToUpdate.amount,
-                        status: 'completed',
-                        date: new Date().toISOString(),
-                        description: 'Order Canceled - Refund',
-                    };
-                    
-                    userToUpdate.transactions = [...(userToUpdate.transactions || []), refundTransaction];
-                    
-                    allUsers[orderToUpdate.userId] = userToUpdate;
-                    localStorage.setItem('users', JSON.stringify(allUsers));
-                    
-                    // Dispatch a storage event so other tabs (like the user's dashboard) will update their wallet in real-time.
-                    window.dispatchEvent(new StorageEvent('storage', { 
-                        key: 'users', 
-                        newValue: JSON.stringify(allUsers),
-                        storageArea: localStorage 
-                    }));
-                    
-                    toast({
-                        title: 'Order Cancelled & Refunded',
-                        description: `₹${orderToUpdate.amount.toFixed(2)} has been refunded to ${userToUpdate.name}.`,
-                    });
-                } else {
-                     toast({
-                        title: 'Refund Failed',
-                        description: `Could not find user ${orderToUpdate.userId} to issue a refund.`,
-                        variant: 'destructive',
-                    });
-                }
-            }
-
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+            if (userToUpdate) {
+                userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + orderToUpdate.amount;
                 
-                // Manually dispatch a storage event to notify other components (like task pages) immediately
-                window.dispatchEvent(new StorageEvent('storage', { 
-                    key: 'adminOrders',
-                    newValue: JSON.stringify(updatedOrders),
-                    oldValue: localStorage.getItem('adminOrders'),
-                    storageArea: localStorage,
-                }));
+                const refundTransaction: Transaction = {
+                    id: `REFUND-${Date.now()}`,
+                    type: 'recharge', // Using 'recharge' to credit the wallet
+                    amount: orderToUpdate.amount,
+                    status: 'completed',
+                    date: new Date().toISOString(),
+                    description: `Refund for cancelled order ${orderToUpdate.id}`,
+                };
+                
+                userToUpdate.transactions = [...(userToUpdate.transactions || []), refundTransaction];
+                
+                allUsers[orderToUpdate.userId] = userToUpdate;
+                localStorage.setItem('users', JSON.stringify(allUsers));
+                
+                // Dispatch event to update user dashboard in real-time
+                window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+                
+                toast({
+                    title: 'Order Cancelled & Refunded',
+                    description: `₹${orderToUpdate.amount.toFixed(2)} was refunded to ${userToUpdate.name}.`,
+                });
+            } else {
+                toast({
+                    title: 'Refund Failed',
+                    description: `User ${orderToUpdate.userId} not found.`,
+                    variant: 'destructive',
+                });
             }
-            
-            return updatedOrders;
-        });
+        }
+        
+        // Update the order status in the local array
+        updatedOrders[orderIndex] = { ...orderToUpdate, status: newStatus };
+
+        // Save the entire updated orders array to localStorage
+        localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+
+        // Manually dispatch a storage event for orders to sync other tabs if needed
+        window.dispatchEvent(new StorageEvent('storage', { key: 'adminOrders' }));
+
+        // Finally, update the React state to re-render the UI
+        setOrders(updatedOrders);
     };
 
     return (
