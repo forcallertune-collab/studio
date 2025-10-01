@@ -21,7 +21,6 @@ export default function AdminOrdersPage() {
     const loadOrders = () => {
         if (typeof window !== 'undefined') {
             const savedOrders = localStorage.getItem('adminOrders');
-            // Ensure initialOrders is used as a fallback if nothing is in localStorage
             setOrders(savedOrders ? JSON.parse(savedOrders) : initialOrders);
         }
     };
@@ -47,67 +46,70 @@ export default function AdminOrdersPage() {
     }, []);
 
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-        const orderToUpdate = orders.find(order => order.id === orderId);
-        if (!orderToUpdate) return;
-        
-        let updatedOrders = orders.map(order =>
-            order.id === orderId ? { ...order, status: newStatus } : order
-        );
+        setOrders(currentOrders => {
+            const orderToUpdate = currentOrders.find(order => order.id === orderId);
+            if (!orderToUpdate) return currentOrders;
 
-        if (newStatus === 'cancelled' && orderToUpdate.status !== 'cancelled') {
-             // Refund logic
-            const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
-            const userToUpdate = allUsers[orderToUpdate.userId];
+            let updatedOrders = currentOrders.map(order =>
+                order.id === orderId ? { ...order, status: newStatus } : order
+            );
 
-            if (userToUpdate) {
-                userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + orderToUpdate.amount;
+            if (newStatus === 'cancelled' && orderToUpdate.status !== 'cancelled') {
+                // Refund logic
+                const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
+                const userToUpdate = allUsers[orderToUpdate.userId];
 
-                const refundTransaction: Transaction = {
-                    id: `REFUND-${Date.now()}`,
-                    type: 'recharge', // Using 'recharge' type to credit the wallet
-                    amount: orderToUpdate.amount,
-                    status: 'completed',
-                    date: new Date().toISOString(),
-                    description: 'Order Canceled - Refund',
-                };
-                userToUpdate.transactions = [...(userToUpdate.transactions || []), refundTransaction];
-                
-                allUsers[orderToUpdate.userId] = userToUpdate;
-                localStorage.setItem('users', JSON.stringify(allUsers));
-                // Dispatch a storage event so other tabs (like the user's dashboard) will update their wallet in real-time.
-                window.dispatchEvent(new StorageEvent('storage', { 
-                    key: 'users', 
-                    newValue: JSON.stringify(allUsers),
-                    storageArea: localStorage 
-                }));
-                
-                toast({
-                    title: 'Order Cancelled & Refunded',
-                    description: `₹${orderToUpdate.amount.toFixed(2)} has been refunded to ${userToUpdate.name}.`,
-                });
-            } else {
-                 toast({
-                    title: 'Refund Failed',
-                    description: `Could not find user ${orderToUpdate.userId} to issue a refund.`,
-                    variant: 'destructive',
-                });
+                if (userToUpdate) {
+                    userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + orderToUpdate.amount;
+
+                    const refundTransaction: Transaction = {
+                        id: `REFUND-${Date.now()}`,
+                        type: 'recharge', // Using 'recharge' type to credit the wallet
+                        amount: orderToUpdate.amount,
+                        status: 'completed',
+                        date: new Date().toISOString(),
+                        description: 'Order Canceled - Refund',
+                    };
+                    
+                    userToUpdate.transactions = [...(userToUpdate.transactions || []), refundTransaction];
+                    
+                    allUsers[orderToUpdate.userId] = userToUpdate;
+                    localStorage.setItem('users', JSON.stringify(allUsers));
+                    
+                    // Dispatch a storage event so other tabs (like the user's dashboard) will update their wallet in real-time.
+                    window.dispatchEvent(new StorageEvent('storage', { 
+                        key: 'users', 
+                        newValue: JSON.stringify(allUsers),
+                        storageArea: localStorage 
+                    }));
+                    
+                    toast({
+                        title: 'Order Cancelled & Refunded',
+                        description: `₹${orderToUpdate.amount.toFixed(2)} has been refunded to ${userToUpdate.name}.`,
+                    });
+                } else {
+                     toast({
+                        title: 'Refund Failed',
+                        description: `Could not find user ${orderToUpdate.userId} to issue a refund.`,
+                        variant: 'destructive',
+                    });
+                }
             }
-        }
 
-
-        setOrders(updatedOrders);
-        
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+                
+                // Manually dispatch a storage event to notify other components (like task pages) immediately
+                window.dispatchEvent(new StorageEvent('storage', { 
+                    key: 'adminOrders',
+                    newValue: JSON.stringify(updatedOrders),
+                    oldValue: localStorage.getItem('adminOrders'),
+                    storageArea: localStorage,
+                }));
+            }
             
-            // Manually dispatch a storage event to notify other components (like task pages) immediately
-            window.dispatchEvent(new StorageEvent('storage', { 
-                key: 'adminOrders',
-                newValue: JSON.stringify(updatedOrders),
-                oldValue: localStorage.getItem('adminOrders'),
-                storageArea: localStorage,
-            }));
-        }
+            return updatedOrders;
+        });
     };
 
     return (
