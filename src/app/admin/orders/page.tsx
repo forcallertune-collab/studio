@@ -64,7 +64,7 @@ export default function AdminOrdersPage() {
 
                 const refundTransaction: Transaction = {
                     id: `REFUND-${Date.now()}`,
-                    type: 'recharge', // Or a new 'refund' type
+                    type: 'recharge', // Using 'recharge' type to credit the wallet
                     amount: orderToUpdate.amount,
                     status: 'completed',
                     date: new Date().toISOString(),
@@ -74,7 +74,12 @@ export default function AdminOrdersPage() {
                 
                 allUsers[orderToUpdate.userId] = userToUpdate;
                 localStorage.setItem('users', JSON.stringify(allUsers));
-                window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+                // Dispatch a storage event so other tabs (like the user's dashboard) will update their wallet in real-time.
+                window.dispatchEvent(new StorageEvent('storage', { 
+                    key: 'users', 
+                    newValue: JSON.stringify(allUsers),
+                    storageArea: localStorage 
+                }));
                 
                 toast({
                     title: 'Order Cancelled & Refunded',
