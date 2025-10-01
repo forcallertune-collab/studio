@@ -2,12 +2,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useContext } from 'react';
-import type { FacebookLikeTask, FacebookFollowTask } from '@/lib/types';
+import type { FacebookLikeTask, FacebookFollowTask, Order } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThumbsUp, UserPlus, ExternalLink, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { initialOrders } from '@/lib/data';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 
 type TaskType = 'like' | 'follow';
@@ -46,11 +45,11 @@ export default function FacebookTasks({ type }: FacebookTasksProps) {
 
   const loadTasks = useCallback(() => {
     const savedOrders = localStorage.getItem('adminOrders');
-    const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+    const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
 
     const dynamicTasks: Task[] = orders
-        .filter((order: any) => order.service === config.serviceName && order.status === 'in progress')
-        .map((order: any) => ({
+        .filter((order) => order.service === config.serviceName && order.status === 'in progress')
+        .map((order) => ({
             id: order.id,
             url: order.link,
             reward: config.reward,

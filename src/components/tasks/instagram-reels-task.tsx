@@ -2,11 +2,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useContext } from 'react';
-import type { InstagramReelTask } from '@/lib/types';
+import type { InstagramReelTask, Order } from '@/lib/types';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink, CheckCircle } from 'lucide-react';
-import { initialOrders } from '@/lib/data';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,11 +21,11 @@ export default function InstagramReelsTask() {
 
   const loadTasks = useCallback(() => {
     const savedOrders = localStorage.getItem('adminOrders');
-    const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+    const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
 
     const dynamicTasks: InstagramReelTask[] = orders
-      .filter((order: any) => order.service === SERVICE_NAME && order.status === 'in progress')
-      .map((order: any) => ({
+      .filter((order) => order.service === SERVICE_NAME && order.status === 'in progress')
+      .map((order) => ({
         id: order.id,
         url: order.link,
         reward: REWARD,

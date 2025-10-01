@@ -2,12 +2,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useContext } from 'react';
-import type { GoogleReviewTask } from '@/lib/types';
+import type { GoogleReviewTask, Order } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, ExternalLink, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { initialOrders } from '@/lib/data';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 
 const SERVICE_NAME = 'Google Reviews';
@@ -36,11 +35,11 @@ export default function GoogleReviewsPage() {
   
   const loadTasks = useCallback(() => {
     const savedOrders = localStorage.getItem('adminOrders');
-    const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+    const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
 
     const dynamicTasks: GoogleReviewTask[] = orders
-        .filter((order: any) => order.service === SERVICE_NAME && order.status === 'in progress')
-        .map((order: any) => ({
+        .filter((order) => order.service === SERVICE_NAME && order.status === 'in progress')
+        .map((order) => ({
             id: order.id,
             url: order.link,
             reward: 5.0, // Example reward, higher for reviews

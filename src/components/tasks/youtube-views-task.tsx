@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { CheckCircle } from 'lucide-react';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
-import { initialOrders } from '@/lib/data';
-import type { VideoTask } from '@/lib/types';
+import type { Order, VideoTask } from '@/lib/types';
 
 const VIDEO_DURATION = 30; // seconds
 
@@ -132,11 +131,11 @@ export default function YoutubeViewsTask() {
 
     const loadTasks = useCallback(() => {
         const savedOrders = localStorage.getItem('adminOrders');
-        const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+        const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
 
         const viewTasks: VideoTask[] = orders
-            .filter((order: any) => order.service === 'YouTube Views' && order.status === 'in progress')
-            .map((order: any) => ({
+            .filter((order) => order.service === 'YouTube Views' && order.status === 'in progress')
+            .map((order) => ({
                 id: order.id, // Use order ID as unique task ID
                 title: `Watch video from ${order.user}`,
                 url: order.link,

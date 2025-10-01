@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useContext } from 'react';
-import type { LikeTask, SubscriptionTask, CommentTask } from '@/lib/types';
+import type { LikeTask, SubscriptionTask, CommentTask, Order } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThumbsUp, UserPlus, MessageSquare, ExternalLink, CheckCircle } from 'lucide-react';
@@ -19,7 +19,6 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { moderateYouTubeComments } from '@/ai/flows/moderate-youtube-comments';
-import { initialOrders } from '@/lib/data';
 import YouTube, { YouTubePlayer } from 'react-youtube';
 import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 
@@ -217,11 +216,11 @@ export default function YoutubeOtherTasks({ type }: YoutubeOtherTasksProps) {
 
   const loadTasks = useCallback(() => {
       const savedOrders = localStorage.getItem('adminOrders');
-      const orders = savedOrders ? JSON.parse(savedOrders) : initialOrders;
+      const orders: Order[] = savedOrders ? JSON.parse(savedOrders) : [];
 
       const dynamicTasks: Task[] = orders
-          .filter((order: any) => order.service === config.serviceName && order.status === 'in progress')
-          .map((order: any) => {
+          .filter((order) => order.service === config.serviceName && order.status === 'in progress')
+          .map((order) => {
               const baseTask = {
                   id: order.id,
                   url: order.link,
