@@ -29,6 +29,19 @@ export const UserContext = createContext<UserContextType>({
     setUser: () => {},
 });
 
+type TaskContextType = {
+  taskCount: number;
+  setTaskCount: React.Dispatch<React.SetStateAction<number>>;
+  incrementTaskCount: () => void;
+};
+
+export const TaskContext = createContext<TaskContextType>({
+  taskCount: 0,
+  setTaskCount: () => {},
+  incrementTaskCount: () => {},
+});
+
+
 export default function DashboardLayout({
   children,
 }: {
@@ -38,6 +51,12 @@ export default function DashboardLayout({
   const [user, setUser] = useState<User | null>(null);
   
   const [walletBalance, setWalletBalance] = useState(0);
+  const [taskCount, setTaskCount] = useState(0);
+
+  const incrementTaskCount = () => {
+    setTaskCount(prevCount => prevCount + 1);
+  };
+
 
   const loadUserData = () => {
     const loggedInUserId = localStorage.getItem('loggedInUserId');
@@ -116,6 +135,8 @@ export default function DashboardLayout({
   }), [walletBalance]);
 
   const userContextValue = useMemo(() => ({ user, setUser }), [user]);
+  
+  const taskContextValue = useMemo(() => ({ taskCount, setTaskCount, incrementTaskCount }), [taskCount]);
 
 
   if (!user) {
@@ -126,21 +147,23 @@ export default function DashboardLayout({
   return (
     <UserContext.Provider value={userContextValue}>
         <WalletContext.Provider value={walletContextValue}>
-          <div className="flex min-h-screen w-full bg-muted/40">
-            <DashboardSidebar userRole={user.role} />
-            <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
-              <DashboardHeader />
-              <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 overflow-auto">
-                {children}
-              </main>
-            </div>
-            {user && ( // Only show welcome dialog if user is loaded
-                <WelcomeDialog
-                isOpen={showWelcome}
-                onClose={handleCloseWelcome}
-                />
-            )}
-          </div>
+          <TaskContext.Provider value={taskContextValue}>
+              <div className="flex min-h-screen w-full bg-muted/40">
+                <DashboardSidebar userRole={user.role} />
+                <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 w-full">
+                  <DashboardHeader />
+                  <main className="flex-1 p-4 sm:px-6 sm:py-0 md:gap-8 overflow-auto">
+                    {children}
+                  </main>
+                </div>
+                {user && ( // Only show welcome dialog if user is loaded
+                    <WelcomeDialog
+                    isOpen={showWelcome}
+                    onClose={handleCloseWelcome}
+                    />
+                )}
+              </div>
+          </TaskContext.Provider>
         </WalletContext.Provider>
     </UserContext.Provider>
   );

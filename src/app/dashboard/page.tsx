@@ -9,7 +9,7 @@ import { ArrowUpRight, Youtube, Rocket, Users } from 'lucide-react';
 import { dummyUser } from '@/lib/data';
 import Image from 'next/image';
 import placeholderImages from '@/lib/placeholder-images.json'
-import { WalletContext } from './layout';
+import { WalletContext, TaskContext } from './layout';
 
 const quickAccessItems = [
     { title: "YouTube Tasks", description: "Views, Likes, Subs & Comments", href: "/dashboard/tasks/youtube", icon: Youtube },
@@ -19,7 +19,7 @@ const quickAccessItems = [
 
 export default function DashboardPage() {
   const { walletBalance } = useContext(WalletContext);
-  const [taskCount, setTaskCount] = useState(0);
+  const { taskCount } = useContext(TaskContext);
   const [referralEarnings, setReferralEarnings] = useState(0);
 
   return (

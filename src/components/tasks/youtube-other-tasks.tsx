@@ -21,7 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { moderateYouTubeComments } from '@/ai/flows/moderate-youtube-comments';
 import { initialOrders } from '@/lib/data';
 import YouTube, { YouTubePlayer } from 'react-youtube';
-import { WalletContext } from '@/app/dashboard/layout';
+import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 
 type TaskType = 'like' | 'subscribe' | 'comment';
 
@@ -77,6 +77,7 @@ const VideoActionDialog = ({ task, onComplete, children, type }: { task: Task; o
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
     const { setWalletBalance } = useContext(WalletContext);
+    const { incrementTaskCount } = useContext(TaskContext);
     
     const videoId = getYouTubeVideoId(task.url);
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
@@ -85,6 +86,7 @@ const VideoActionDialog = ({ task, onComplete, children, type }: { task: Task; o
 
     const handleAction = () => {
         setWalletBalance(prev => prev + reward);
+        incrementTaskCount();
         onComplete(task.id);
         toast({
             title: 'Task Complete!',
@@ -134,6 +136,7 @@ const VideoActionDialog = ({ task, onComplete, children, type }: { task: Task; o
 const CommentDialog = ({ task, onComplete }: { task: CommentTask, onComplete: (taskId: string) => void }) => {
     const { toast } = useToast();
     const { setWalletBalance } = useContext(WalletContext);
+    const { incrementTaskCount } = useContext(TaskContext);
     const [comment, setComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -144,6 +147,7 @@ const CommentDialog = ({ task, onComplete }: { task: CommentTask, onComplete: (t
             const result = await moderateYouTubeComments({ comment, templates: task.templates });
             if (result.isApproved) {
                 setWalletBalance(prev => prev + task.reward);
+                incrementTaskCount();
                 onComplete(task.id);
                 toast({
                     title: "Comment Approved!",

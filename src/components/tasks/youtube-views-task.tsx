@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { CheckCircle } from 'lucide-react';
-import { WalletContext } from '@/app/dashboard/layout';
+import { WalletContext, TaskContext } from '@/app/dashboard/layout';
 import { initialOrders } from '@/lib/data';
 import type { VideoTask } from '@/lib/types';
 
@@ -35,6 +35,7 @@ const VideoPlayerDialog = ({ task, onComplete, children }: { task: VideoTask; on
     const [isPlaying, setIsPlaying] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
     const { setWalletBalance } = useContext(WalletContext);
+    const { incrementTaskCount } = useContext(TaskContext);
 
     const videoId = useMemo(() => getYouTubeVideoId(task.url), [task.url]);
     const progress = useMemo(() => ((VIDEO_DURATION - timeLeft) / VIDEO_DURATION) * 100, [timeLeft]);
@@ -52,12 +53,13 @@ const VideoPlayerDialog = ({ task, onComplete, children }: { task: VideoTask; on
             }
             if (!isCompleted) {
                 setWalletBalance(prev => prev + task.reward);
+                incrementTaskCount();
                 setIsCompleted(true);
                 onComplete();
             }
         }
         return () => clearInterval(timer);
-    }, [isPlaying, timeLeft, player, task.reward, setWalletBalance, isCompleted, onComplete]);
+    }, [isPlaying, timeLeft, player, task.reward, setWalletBalance, isCompleted, onComplete, incrementTaskCount]);
 
     const onPlayerReady = useCallback((event: { target: YouTubePlayer }) => {
         setPlayer(event.target);
