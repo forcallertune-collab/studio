@@ -75,6 +75,16 @@ export default function WalletPage() {
 
         const savedRequests = localStorage.getItem('paymentRequests');
         const paymentRequests: PaymentRequest[] = savedRequests ? JSON.parse(savedRequests) : [];
+        
+        const idExists = paymentRequests.some(req => req.id === transactionId);
+        if (idExists) {
+            toast({
+                title: 'Duplicate Transaction ID',
+                description: 'This transaction ID has already been used.',
+                variant: 'destructive',
+            });
+            return;
+        }
 
         const newRequest: PaymentRequest = {
             id: transactionId,
