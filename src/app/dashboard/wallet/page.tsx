@@ -8,6 +8,8 @@ import { Wallet, BadgeIndianRupee, History, Copy, Upload } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +24,13 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { WalletContext, UserContext } from '../layout';
 import placeholderImages from '@/lib/placeholder-images.json';
-import type { PaymentRequest, WithdrawalRequest } from '@/lib/types';
+import type { PaymentRequest, WithdrawalRequest, Transaction } from '@/lib/types';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export default function WalletPage() {
     const { walletBalance, setWalletBalance } = useContext(WalletContext);
-    const { user } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const { toast } = useToast();
     
     // Recharge state
@@ -117,12 +120,12 @@ export default function WalletPage() {
             return;
         }
 
-        // Deduct from balance and create request
-        setWalletBalance(prev => prev - amount);
-
+        const requestId = `WTH-${Date.now()}`;
+        
+        // Create withdrawal request for admin
         const withdrawalRequests: WithdrawalRequest[] = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
         const newRequest: WithdrawalRequest = {
-            id: `WTH-${Date.now()}`,
+            id: requestId,
             userId: user.userId,
             userEmail: user.email,
             amount: amount,
@@ -130,9 +133,31 @@ export default function WalletPage() {
             status: 'pending',
             date: new Date().toISOString(),
         };
-
         withdrawalRequests.push(newRequest);
         localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
+
+        // Create transaction history entry for user
+        const newTransaction: Transaction = {
+            id: requestId,
+            type: 'withdrawal',
+            amount: amount,
+            status: 'pending',
+            date: new Date().toISOString(),
+            description: `Withdrawal to ${user.upiId}`,
+        };
+
+        if (setUser) {
+            setUser(prevUser => {
+                if (!prevUser) return null;
+                const updatedTransactions = [...(prevUser.transactions || []), newTransaction];
+                return { 
+                    ...prevUser, 
+                    walletBalance: prevUser.walletBalance - amount,
+                    transactions: updatedTransactions 
+                };
+            });
+        }
+
 
         toast({
             title: 'Withdrawal Request Submitted',
@@ -142,6 +167,8 @@ export default function WalletPage() {
         setIsWithdrawalDialog(false);
         setWithdrawalAmount('');
     };
+
+    const sortedTransactions = user?.transactions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) || [];
 
 
     return (
@@ -273,10 +300,47 @@ export default function WalletPage() {
                     <h3 className="font-headline text-xl mb-4 flex items-center gap-2"><History /> Transaction History</h3>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-center py-12 bg-muted/50 rounded-lg">
-                        <p className="text-muted-foreground">No transactions yet.</p>
-                        <p className="text-sm text-muted-foreground">Your transaction history will appear here.</p>
-                    </div>
+                     {sortedTransactions.length > 0 ? (
+                        <div className="border rounded-lg">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {sortedTransactions.map(tx => (
+                                        <TableRow key={tx.id}>
+                                            <TableCell>{new Date(tx.date).toLocaleDateString()}</TableCell>
+                                            <TableCell className="capitalize">{tx.type}</TableCell>
+                                            <TableCell className="font-mono text-xs">{tx.description}</TableCell>
+                                            <TableCell className={cn("font-semibold", tx.type === 'recharge' ? 'text-green-600' : 'text-red-600')}>
+                                                {tx.type === 'recharge' ? '+' : '-'} ₹{tx.amount.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={tx.status === 'rejected' ? 'destructive' : 'secondary'}
+                                                    className={cn('capitalize', {
+                                                        'bg-green-600 text-white': tx.status === 'approved' || tx.status === 'completed',
+                                                        'bg-yellow-500 text-white': tx.status === 'pending',
+                                                    })}>
+                                                    {tx.status}
+                                                </Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 bg-muted/50 rounded-lg">
+                            <p className="text-muted-foreground">No transactions yet.</p>
+                            <p className="text-sm text-muted-foreground">Your transaction history will appear here.</p>
+                        </div>
+                     )}
                 </CardContent>
             </Card>
         </div>

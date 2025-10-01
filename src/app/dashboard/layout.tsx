@@ -82,14 +82,17 @@ export default function DashboardLayout({
   }, []);
 
   useEffect(() => {
-    // Persist changes to localStorage whenever walletBalance or user state changes
+    // Persist changes to localStorage whenever user state changes
     if (user) {
         const allUsers = JSON.parse(localStorage.getItem('users') || '{}');
         const loggedInUserId = localStorage.getItem('loggedInUserId');
         
         if (loggedInUserId && allUsers[loggedInUserId]) {
-            // Create an updated user object with the new balance
-            const updatedUser = { ...user, walletBalance };
+            // Create an updated user object
+            const updatedUser = { 
+                ...user, 
+                walletBalance: user.walletBalance, // Ensure wallet balance is from the user state
+            };
             allUsers[loggedInUserId] = updatedUser;
             localStorage.setItem('users', JSON.stringify(allUsers));
         }
@@ -97,8 +100,9 @@ export default function DashboardLayout({
         if (user.role) {
             localStorage.setItem('userRole', user.role);
         }
+        setWalletBalance(user.walletBalance); // Also update the separate wallet balance state
     }
-  }, [walletBalance, user]);
+  }, [user]);
 
 
   const handleCloseWelcome = () => {

@@ -1,5 +1,14 @@
 
 
+export type Transaction = {
+  id: string;
+  type: 'recharge' | 'withdrawal' | 'task_earning';
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
+  date: string;
+  description: string;
+};
+
 export type User = {
   userId: string; // Add a stable user ID
   name: string;
@@ -10,6 +19,7 @@ export type User = {
   walletBalance: number;
   upiId?: string;
   avatarUrl?: string;
+  transactions?: Transaction[];
 };
 
 export type VideoTask = {
@@ -44,7 +54,7 @@ export type CommentTask = {
 export type FacebookLikeTask = {
   id: string;
   pageName: string;
-  url: string;
+  url:string;
   reward: number;
 };
 

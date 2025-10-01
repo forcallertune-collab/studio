@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { WithdrawalRequest, User } from '@/lib/types';
+import type { WithdrawalRequest, User, Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
 
@@ -27,29 +27,45 @@ export default function AdminWithdrawalsPage() {
             if (req.id === requestId && req.status === 'pending') {
                 const newStatus = action === 'approve' ? 'approved' : 'rejected';
                 
+                const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
+                const userToUpdate = allUsers[req.userId];
+                
+                if (!userToUpdate) {
+                    toast({ title: 'Error', description: 'Could not find user.', variant: 'destructive' });
+                    return req; // Skip update if user not found
+                }
+                
+                // Find and update the specific transaction
+                const transactionIndex = userToUpdate.transactions?.findIndex(t => t.id === req.id);
+
                 if (newStatus === 'rejected') {
                     // Refund the amount to the user's wallet
-                    const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
-                    const userId = req.userId;
-
-                    if (allUsers[userId]) {
-                        allUsers[userId].walletBalance = (allUsers[userId].walletBalance || 0) + req.amount;
-                        localStorage.setItem('users', JSON.stringify(allUsers));
-                        
-                        toast({
-                            title: 'Withdrawal Rejected',
-                            description: `₹${req.amount.toFixed(2)} has been refunded to ${req.userEmail}.`,
-                            variant: 'destructive',
-                        });
-                    } else {
-                        toast({ title: 'Error', description: 'Could not find user to refund.', variant: 'destructive' });
+                    userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + req.amount;
+                    
+                    if (transactionIndex !== -1 && userToUpdate.transactions) {
+                        userToUpdate.transactions[transactionIndex].status = 'rejected';
                     }
+
+                    toast({
+                        title: 'Withdrawal Rejected',
+                        description: `₹${req.amount.toFixed(2)} has been refunded to ${req.userEmail}.`,
+                        variant: 'destructive',
+                    });
+
                 } else if (newStatus === 'approved') {
+                    if (transactionIndex !== -1 && userToUpdate.transactions) {
+                        userToUpdate.transactions[transactionIndex].status = 'approved';
+                    }
                     toast({
                         title: 'Withdrawal Approved',
                         description: `Request for ₹${req.amount.toFixed(2)} has been approved.`,
                     });
                 }
+                
+                allUsers[req.userId] = userToUpdate;
+                localStorage.setItem('users', JSON.stringify(allUsers));
+                window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+
 
                 return { ...req, status: newStatus };
             }
@@ -60,7 +76,6 @@ export default function AdminWithdrawalsPage() {
         localStorage.setItem('withdrawalRequests', JSON.stringify(updatedRequests));
     };
 
-    const pendingRequests = withdrawalRequests.filter(r => r.status === 'pending');
 
     return (
         <Card>

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { PaymentRequest, User } from '@/lib/types';
+import type { PaymentRequest, User, Transaction } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Check, X } from 'lucide-react';
 
@@ -28,35 +28,46 @@ export default function AdminPaymentsPage() {
             if (req.id === requestId && req.status === 'pending') {
                 const newStatus = action === 'approve' ? 'approved' : 'rejected';
                 
-                if (newStatus === 'approved') {
-                    // Critical fix: Load the LATEST users data right before updating.
-                    const allUsers: {[key: string]: User} = JSON.parse(localStorage.getItem('users') || '{}');
-                    const userId = req.userId;
-                    
-                    if (allUsers[userId]) {
-                        const updatedUser = {
-                            ...allUsers[userId],
-                            walletBalance: (allUsers[userId].walletBalance || 0) + req.amount,
-                        };
-                        allUsers[userId] = updatedUser;
+                // Critical fix: Load the LATEST users data right before updating.
+                const allUsers: {[key: string]: User} = JSON.parse(localStorage.getItem('users') || '{}');
+                const userId = req.userId;
+                const userToUpdate = allUsers[userId];
+                
+                if (userToUpdate) {
+                    if (newStatus === 'approved') {
+                        // Add funds to wallet
+                        userToUpdate.walletBalance = (userToUpdate.walletBalance || 0) + req.amount;
 
-                        // Save the updated users object back to localStorage.
-                        localStorage.setItem('users', JSON.stringify(allUsers));
+                        // Add transaction history
+                        const newTransaction: Transaction = {
+                            id: `TXN-${Date.now()}`,
+                            type: 'recharge',
+                            amount: req.amount,
+                            status: 'completed',
+                            date: new Date().toISOString(),
+                            description: `Wallet recharge via ${req.id}`,
+                        };
+                        userToUpdate.transactions = [...(userToUpdate.transactions || []), newTransaction];
 
                         toast({
                             title: 'Payment Approved',
-                            description: `₹${req.amount.toFixed(2)} added to the wallet of ${allUsers[userId].name}.`,
+                            description: `₹${req.amount.toFixed(2)} added to the wallet of ${userToUpdate.name}.`,
                         });
-                    } else {
+                    } else if (newStatus === 'rejected') {
                          toast({
-                            title: 'User not found',
-                            description: `Could not find user to credit payment.`,
+                            title: 'Payment Rejected',
                             variant: 'destructive',
                         });
                     }
-                } else if (newStatus === 'rejected') {
+                    
+                    // Save the updated users object back to localStorage.
+                    allUsers[userId] = userToUpdate;
+                    localStorage.setItem('users', JSON.stringify(allUsers));
+                    window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+                } else {
                      toast({
-                        title: 'Payment Rejected',
+                        title: 'User not found',
+                        description: `Could not find user to update payment.`,
                         variant: 'destructive',
                     });
                 }
