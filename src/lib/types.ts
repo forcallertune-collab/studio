@@ -72,7 +72,14 @@ export type InstagramReelTask = {
   reward: number;
 };
 
-export type Platform = 'youtube' | 'facebook' | 'instagram';
+export type AppDownloadTask = {
+  id: string;
+  appName: string;
+  url: string;
+  reward: number;
+};
+
+export type Platform = 'youtube' | 'facebook' | 'instagram' | 'app';
 
 export type AdvertiserService = {
   id: string;

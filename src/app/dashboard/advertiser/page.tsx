@@ -10,13 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { advertiserServices, initialOrders } from "@/lib/data";
 import type { Platform, Transaction } from "@/lib/types";
-import { Rocket, Youtube, Facebook, Instagram, Wallet } from "lucide-react";
+import { Rocket, Youtube, Facebook, Instagram, Wallet, Download } from "lucide-react";
 import { WalletContext, UserContext } from "../layout";
 
-const platformIcons = {
+const platformIcons: { [key in Platform]: JSX.Element } = {
     youtube: <Youtube className="h-5 w-5" />,
     facebook: <Facebook className="h-5 w-5" />,
     instagram: <Instagram className="h-5 w-5" />,
+    app: <Download className="h-5 w-5" />,
 }
 
 export default function AdvertiserPage() {
@@ -48,6 +49,9 @@ export default function AdvertiserPage() {
             } else if (currentPlatform === 'instagram') {
                 isValid = url.hostname.includes('instagram.com');
                 expectedHost = 'instagram.com';
+            } else if (currentPlatform === 'app') {
+                isValid = url.hostname.includes('play.google.com') || url.hostname.includes('apps.apple.com');
+                expectedHost = 'play.google.com or apps.apple.com';
             }
         } catch (error) {
             isValid = false; // Invalid URL format
@@ -210,6 +214,7 @@ export default function AdvertiserPage() {
                                         <SelectItem value="youtube">YouTube</SelectItem>
                                         <SelectItem value="facebook">Facebook</SelectItem>
                                         <SelectItem value="instagram">Instagram</SelectItem>
+                                        <SelectItem value="app">App Downloads</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -300,5 +305,3 @@ export default function AdvertiserPage() {
         </Card>
     );
 }
-
-    
