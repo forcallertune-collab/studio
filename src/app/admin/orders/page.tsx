@@ -11,50 +11,66 @@ import { initialOrders } from '@/lib/data';
 
 type OrderStatus = 'completed' | 'processing' | 'pending' | 'failed' | 'cancelled' | 'in progress';
 
+// A type for the orders to ensure consistency
+type Order = {
+    id: string;
+    user: string;
+    service: string;
+    link: string;
+    quantity: number;
+    amount: number;
+    status: OrderStatus;
+    date: string;
+};
+
 
 export default function AdminOrdersPage() {
-    const [orders, setOrders] = useState(() => {
-        if (typeof window === 'undefined') {
-            return initialOrders;
-        }
-        const savedOrders = localStorage.getItem('adminOrders');
-        return savedOrders ? JSON.parse(savedOrders) : initialOrders;
-    });
+    const [orders, setOrders] = useState<Order[]>([]);
 
-    useEffect(() => {
-        const handleStorageChange = () => {
+    // Function to load orders from localStorage
+    const loadOrders = () => {
+        if (typeof window !== 'undefined') {
             const savedOrders = localStorage.getItem('adminOrders');
             setOrders(savedOrders ? JSON.parse(savedOrders) : initialOrders);
+        }
+    };
+
+    // Load orders on initial component mount
+    useEffect(() => {
+        loadOrders();
+    }, []);
+
+    // Listen for storage changes to keep data in sync across tabs
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'adminOrders') {
+                loadOrders();
+            }
         };
 
         window.addEventListener('storage', handleStorageChange);
-
-        // Also update on component mount in case of race conditions
-        handleStorageChange();
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
         };
     }, []);
 
-    useEffect(() => {
-        localStorage.setItem('adminOrders', JSON.stringify(orders));
-    }, [orders]);
-
-
     const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-        setOrders(prevOrders => 
-            prevOrders.map(order => 
-                order.id === orderId ? { ...order, status: newStatus } : order
-            )
+        const updatedOrders = orders.map(order => 
+            order.id === orderId ? { ...order, status: newStatus } : order
         );
+        setOrders(updatedOrders);
+        localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+        
+        // Manually dispatch a storage event to notify other components (like task pages) immediately
+        window.dispatchEvent(new StorageEvent('storage', { key: 'adminOrders' }));
     };
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Orders</CardTitle>
-                <CardDescription>A list of all recent advertiser orders.</CardDescription>
+                <CardDescription>A list of all recent advertiser orders. Change the status to control task visibility for users.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -66,12 +82,12 @@ export default function AdminOrdersPage() {
                             <TableHead>Link</TableHead>
                             <TableHead>Quantity</TableHead>
                             <TableHead>Amount</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Status (Task Control)</TableHead>
                             <TableHead>Date</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.map((order: any) => (
+                        {orders.map((order) => (
                             <TableRow key={order.id}>
                                 <TableCell className="font-medium">{order.id}</TableCell>
                                 <TableCell>{order.user}</TableCell>
@@ -96,14 +112,14 @@ export default function AdminOrdersPage() {
                                             </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="pending">Pending</SelectItem>
-                                            <SelectItem value="in progress">In Progress</SelectItem>
-                                            <SelectItem value="completed">Completed</SelectItem>
-                                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                                            <SelectItem value="pending">Pending (Hidden)</SelectItem>
+                                            <SelectItem value="in progress">In Progress (Active)</SelectItem>
+                                            <SelectItem value="completed">Completed (Hidden)</SelectItem>
+                                            <SelectItem value="cancelled">Cancelled (Hidden)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </TableCell>
-                                <TableCell>{order.date}</TableCell>
+                                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
