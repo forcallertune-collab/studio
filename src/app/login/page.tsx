@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -54,7 +53,7 @@ function LoginPageContent() {
     } else {
       setSignupReferral('');
       // Default to login tab if no ref code
-      // No need to setActiveTab here as it's the default state
+      setActiveTab('login');
     }
   }, [searchParams]);
 
