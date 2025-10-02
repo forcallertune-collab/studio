@@ -37,7 +37,7 @@ function LoginPageContent() {
 
 
   useEffect(() => {
-    // ALWAYS clear all fields on component mount to avoid showing stale data from previous sessions.
+    // ALWAYS clear all fields on component mount to avoid showing stale data.
     setLoginEmail('');
     setLoginPassword('');
     setSignupName('');
@@ -45,14 +45,15 @@ function LoginPageContent() {
     setSignupPassword('');
     setSignupUpiId('');
     
-    // If a referral code is in the URL, switch to the signup tab and set the referral code.
+    // Check for a referral code in the URL.
     const refCode = searchParams.get('ref');
     if (refCode) {
+      // If found, switch to signup tab and set the referral code.
       setSignupReferral(refCode);
       setActiveTab('signup');
     } else {
+      // Otherwise, ensure referral code is empty and default to login tab.
       setSignupReferral('');
-      // Default to login tab if no ref code
       setActiveTab('login');
     }
   }, [searchParams]);
