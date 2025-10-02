@@ -13,7 +13,7 @@ export default function WelcomePage() {
         {/* Header Section */}
         <section className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
-            Welcome to <span className="text-primary font-bold">Sociara</span>
+            Welcome to <span className="text-primary font-bold">mhfl</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Watch YouTube videos, earn real money! Complete simple tasks and get paid for every action. New video player system with automatic rewards!

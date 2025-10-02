@@ -147,7 +147,7 @@ function LoginPageContent() {
     
     toast({
         title: "Account Created!",
-        description: "Welcome to Sociara! You can now start earning."
+        description: "Welcome to mhfl! You can now start earning."
     });
     router.push('/dashboard');
   };

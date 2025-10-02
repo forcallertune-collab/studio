@@ -14,14 +14,14 @@ export default function BroadcastPage() {
     const [announcement, setAnnouncement] = useState('');
 
     useEffect(() => {
-        const savedAnnouncement = localStorage.getItem('sociara-announcement');
+        const savedAnnouncement = localStorage.getItem('mhfl-announcement');
         if (savedAnnouncement) {
             setAnnouncement(savedAnnouncement);
         }
     }, []);
     
     const handleSaveAnnouncement = () => {
-        localStorage.setItem('sociara-announcement', announcement);
+        localStorage.setItem('mhfl-announcement', announcement);
         toast({
             title: 'Announcement Published',
             description: 'The message is now live for all users.',
@@ -30,7 +30,7 @@ export default function BroadcastPage() {
 
     const handleClearAnnouncement = () => {
         setAnnouncement('');
-        localStorage.removeItem('sociara-announcement');
+        localStorage.removeItem('mhfl-announcement');
         toast({
             title: 'Announcement Cleared',
         });

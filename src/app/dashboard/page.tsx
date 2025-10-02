@@ -15,15 +15,15 @@ export default function DashboardPage() {
     const { walletBalance } = useContext(WalletContext);
 
     useEffect(() => {
-        const savedAnnouncement = localStorage.getItem('sociara-announcement');
+        const savedAnnouncement = localStorage.getItem('mhfl-announcement');
         if (savedAnnouncement) {
             setAnnouncement(savedAnnouncement);
         }
     }, []);
 
     // Placeholder data
-    const totalReferrals = 0;
-    const referralEarnings = 0.00;
+    const totalReferrals = user?.referrals?.length || 0;
+    const referralEarnings = user?.transactions?.filter(tx => tx.type === 'referral_bonus').reduce((acc, tx) => acc + tx.amount, 0) || 0.00;
 
     return (
         <div className="grid gap-6">
