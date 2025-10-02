@@ -116,19 +116,7 @@ function LoginPageContent() {
     if (signupReferral) {
         const referrer = Object.values(users).find(u => u.referralCode === signupReferral);
         if (referrer) {
-            // 1. Give new user a bonus
-            newUser.walletBalance += REFERRAL_BONUS;
-            const newUserBonusTx: Transaction = {
-                id: `TXN-REF-${Date.now()}`,
-                type: 'referral_bonus',
-                amount: REFERRAL_BONUS,
-                status: 'completed',
-                date: new Date().toISOString(),
-                description: `Signup bonus for using referral code ${signupReferral}.`,
-            };
-            newUser.transactions!.push(newUserBonusTx);
-
-            // 2. Give referrer a bonus
+            // Give referrer a bonus
             referrer.walletBalance += REFERRAL_BONUS;
             const referrerBonusTx: Transaction = {
                 id: `TXN-REF-EARN-${Date.now()}`,
@@ -141,11 +129,11 @@ function LoginPageContent() {
             if (!referrer.transactions) referrer.transactions = [];
             referrer.transactions.push(referrerBonusTx);
             
-            // 3. Track the referral
+            // Track the referral
             if (!referrer.referrals) referrer.referrals = [];
             referrer.referrals.push(newUser.userId);
             
-            // 4. Update referrer in the users object
+            // Update referrer in the users object
             users[referrer.userId] = referrer;
         }
     }
@@ -159,7 +147,7 @@ function LoginPageContent() {
     
     toast({
         title: "Account Created!",
-        description: "Welcome to Sociara! Check your wallet for a referral bonus."
+        description: "Welcome to Sociara! You can now start earning."
     });
     router.push('/dashboard');
   };
