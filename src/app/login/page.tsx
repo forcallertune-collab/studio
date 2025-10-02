@@ -117,7 +117,7 @@ function LoginPageContent() {
         const referrer = Object.values(users).find(u => u.referralCode === signupReferral);
         if (referrer) {
             // Give referrer a bonus
-            referrer.walletBalance += REFERRAL_BONUS;
+            referrer.walletBalance = (referrer.walletBalance || 0) + REFERRAL_BONUS;
             const referrerBonusTx: Transaction = {
                 id: `TXN-REF-EARN-${Date.now()}`,
                 type: 'referral_bonus',
