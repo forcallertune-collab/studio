@@ -85,7 +85,7 @@ export default function DashboardLayout({
     }
 
     const handleStorageChange = (e: StorageEvent) => {
-        // When 'users' data changes from another tab (like the admin panel), reload it.
+        // When 'users' data changes from another tab (like the admin panel or signup page), reload it.
         if (e.key === 'users') {
             loadUserData();
         }

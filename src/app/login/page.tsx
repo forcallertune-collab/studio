@@ -142,6 +142,9 @@ function LoginPageContent() {
     users[userId] = newUser;
     localStorage.setItem('users', JSON.stringify(users));
     
+    // Dispatch a storage event so other tabs (like the referrer's dashboard) can update in real-time
+    window.dispatchEvent(new StorageEvent('storage', { key: 'users' }));
+    
     localStorage.setItem('loggedInUserId', userId);
     localStorage.setItem('welcomeShown', 'false');
     
