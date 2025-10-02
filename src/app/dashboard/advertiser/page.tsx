@@ -11,6 +11,7 @@ import { advertiserServices, initialOrders } from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import OrderFormSheet from '@/components/advertiser/order-form-sheet';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdvertiserPage() {
     const { walletBalance } = useContext(WalletContext);
