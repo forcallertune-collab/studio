@@ -37,7 +37,10 @@ function LoginPageContent() {
 
 
   useEffect(() => {
-    // ALWAYS clear all fields on component mount to avoid showing stale data.
+    // This hook runs once when the component mounts.
+    // It guarantees a clean slate for every visitor.
+    
+    // Clear all form fields to prevent showing stale data.
     setLoginEmail('');
     setLoginPassword('');
     setSignupName('');
@@ -45,11 +48,14 @@ function LoginPageContent() {
     setSignupPassword('');
     setSignupUpiId('');
     
+    // Check for a referral code in the URL.
     const refCode = searchParams.get('ref');
     if (refCode) {
+      // If a code exists, pre-fill the referral input and switch to the signup tab.
       setSignupReferral(refCode);
       setActiveTab('signup');
     } else {
+      // Otherwise, clear the referral field and default to the login tab.
       setSignupReferral('');
       setActiveTab('login');
     }
@@ -79,9 +85,6 @@ function LoginPageContent() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!localStorage.getItem('users')) {
-      localStorage.clear();
-    }
     
     const users: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
     
@@ -133,7 +136,7 @@ function LoginPageContent() {
             if (!referrer.referrals) referrer.referrals = [];
             referrer.referrals.push(newUser.userId);
             
-            // Update referrer in the users object
+            // CRITICAL FIX: Update the referrer in the main users object
             users[referrer.userId] = referrer;
         }
     }
