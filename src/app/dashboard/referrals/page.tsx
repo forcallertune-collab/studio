@@ -7,20 +7,39 @@ import { Button } from '@/components/ui/button';
 import { Copy, Users, UserPlus, BadgeIndianRupee } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { UserContext } from '@/app/dashboard/layout';
+import type { User } from '@/lib/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function ReferralsPage() {
     const { toast } = useToast();
     const { user } = useContext(UserContext);
     const [referralLink, setReferralLink] = useState('');
+    
+    const [referredUsers, setReferredUsers] = useState<User[]>([]);
     const [totalReferrals, setTotalReferrals] = useState(0);
-    const [activeReferrals, setActiveReferrals] = useState(0);
+    const [activeReferrals, setActiveReferrals] = useState(0); // Placeholder for now
     const [totalEarnings, setTotalEarnings] = useState(0);
 
     useEffect(() => {
         if (user?.referralCode) {
             setReferralLink(`${window.location.origin}/login?ref=${user.referralCode}`);
         }
-    }, [user?.referralCode]);
+
+        if (user?.referrals && user.referrals.length > 0) {
+            const allUsers: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
+            const foundUsers = user.referrals.map(userId => allUsers[userId]).filter(Boolean); // Filter out any not found
+            setReferredUsers(foundUsers);
+            setTotalReferrals(foundUsers.length);
+        }
+
+        // Calculate total referral earnings
+        const referralBonuses = user?.transactions
+            ?.filter(tx => tx.type === 'referral_bonus')
+            .reduce((sum, tx) => sum + tx.amount, 0) || 0;
+        setTotalEarnings(referralBonuses);
+
+    }, [user]);
 
     const copyReferralLink = () => {
         if (!referralLink) return;
@@ -81,9 +100,40 @@ export default function ReferralsPage() {
                     <div>
                         <h3 className="font-headline text-xl mb-4">My Team</h3>
                          <div className="border rounded-lg">
-                             <div className="text-center py-12 bg-muted/50 rounded-lg">
-                                <p className="text-muted-foreground">Your referred users will appear here.</p>
-                            </div>
+                             {referredUsers.length > 0 ? (
+                                 <Table>
+                                     <TableHeader>
+                                         <TableRow>
+                                             <TableHead>User</TableHead>
+                                             <TableHead>Email</TableHead>
+                                             <TableHead>Status</TableHead>
+                                         </TableRow>
+                                     </TableHeader>
+                                     <TableBody>
+                                         {referredUsers.map(referredUser => (
+                                             <TableRow key={referredUser.userId}>
+                                                 <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <Avatar className="h-9 w-9">
+                                                            <AvatarImage src={referredUser.avatarUrl} alt={referredUser.name} />
+                                                            <AvatarFallback>{referredUser.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="font-medium">{referredUser.name}</span>
+                                                    </div>
+                                                 </TableCell>
+                                                 <TableCell>{referredUser.email}</TableCell>
+                                                 <TableCell>
+                                                    <span className="text-green-600 font-semibold">Active</span>
+                                                 </TableCell>
+                                             </TableRow>
+                                         ))}
+                                     </TableBody>
+                                 </Table>
+                             ) : (
+                                <div className="text-center py-12 bg-muted/50 rounded-lg">
+                                    <p className="text-muted-foreground">Your referred users will appear here.</p>
+                                </div>
+                             )}
                         </div>
                     </div>
                 </CardContent>

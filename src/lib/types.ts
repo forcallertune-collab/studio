@@ -2,7 +2,7 @@
 
 export type Transaction = {
   id: string;
-  type: 'recharge' | 'withdrawal' | 'task_earning' | 'order_placed';
+  type: 'recharge' | 'withdrawal' | 'task_earning' | 'order_placed' | 'referral_bonus';
   amount: number;
   status: 'pending' | 'approved' | 'rejected' | 'completed';
   date: string;
@@ -17,6 +17,7 @@ export type User = {
   role: 'earner' | 'advertiser' | 'both';
   referralCode: string;
   referredBy?: string;
+  referrals?: string[]; // Array of userIds
   walletBalance: number;
   upiId?: string;
   avatarUrl?: string;

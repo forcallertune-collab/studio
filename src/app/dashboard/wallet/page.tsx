@@ -186,6 +186,21 @@ export default function WalletPage() {
 
     const sortedTransactions = user?.transactions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) || [];
 
+    const getTxAmountClass = (tx: Transaction) => {
+        const incomeTypes: Transaction['type'][] = ['recharge', 'task_earning', 'referral_bonus'];
+        if (incomeTypes.includes(tx.type)) {
+            return 'text-green-600';
+        }
+        return 'text-red-600';
+    }
+
+    const getTxAmountPrefix = (tx: Transaction) => {
+        const incomeTypes: Transaction['type'][] = ['recharge', 'task_earning', 'referral_bonus'];
+        if (incomeTypes.includes(tx.type)) {
+            return '+';
+        }
+        return '-';
+    }
 
     return (
         <div className="grid gap-8">
@@ -368,10 +383,10 @@ export default function WalletPage() {
                                     {sortedTransactions.map(tx => (
                                         <TableRow key={tx.id}>
                                             <TableCell>{new Date(tx.date).toLocaleDateString()}</TableCell>
-                                            <TableCell className="capitalize">{tx.type.replace('_', ' ')}</TableCell>
+                                            <TableCell className="capitalize">{tx.type.replace(/_/g, ' ')}</TableCell>
                                             <TableCell className="font-mono text-xs">{tx.description}</TableCell>
-                                            <TableCell className={cn("font-semibold", tx.type === 'recharge' ? 'text-green-600' : 'text-red-600')}>
-                                                {tx.type === 'recharge' ? '+' : '-'} ₹{tx.amount.toFixed(2)}
+                                            <TableCell className={cn("font-semibold", getTxAmountClass(tx))}>
+                                                {getTxAmountPrefix(tx)} ₹{tx.amount.toFixed(2)}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={tx.status === 'rejected' ? 'destructive' : 'secondary'}

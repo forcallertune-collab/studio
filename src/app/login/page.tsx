@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Logo from '@/components/logo';
 import { useToast } from '@/hooks/use-toast';
-import type { User } from '@/lib/types';
+import type { User, Transaction } from '@/lib/types';
 import Link from 'next/link';
 
 function LoginPageContent() {
@@ -45,14 +45,11 @@ function LoginPageContent() {
     setSignupPassword('');
     setSignupUpiId('');
     
-    // Check for a referral code in the URL.
     const refCode = searchParams.get('ref');
     if (refCode) {
-      // If found, switch to signup tab and set the referral code.
       setSignupReferral(refCode);
       setActiveTab('signup');
     } else {
-      // Otherwise, ensure referral code is empty and default to login tab.
       setSignupReferral('');
       setActiveTab('login');
     }
@@ -82,12 +79,11 @@ function LoginPageContent() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // On first signup, clear all previous local storage to ensure a fresh start
     if (!localStorage.getItem('users')) {
       localStorage.clear();
     }
     
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    const users: { [key: string]: User } = JSON.parse(localStorage.getItem('users') || '{}');
     
     const emailExists = Object.values(users).some((u: any) => u.email === signupEmail);
     if (emailExists) {
@@ -104,24 +100,66 @@ function LoginPageContent() {
         userId,
         name: signupName,
         email: signupEmail,
-        password: signupPassword, // In a real app, this should be hashed
+        password: signupPassword,
         upiId: signupUpiId,
         role: role,
         referralCode: generateReferralCode(),
         referredBy: signupReferral || undefined,
+        referrals: [],
         walletBalance: 0.00,
         transactions: [],
     };
+    
+    const REFERRAL_BONUS = 25;
 
-    users[userId] = newUser; // Use userId as the key
+    // Handle referral logic
+    if (signupReferral) {
+        const referrer = Object.values(users).find(u => u.referralCode === signupReferral);
+        if (referrer) {
+            // 1. Give new user a bonus
+            newUser.walletBalance += REFERRAL_BONUS;
+            const newUserBonusTx: Transaction = {
+                id: `TXN-REF-${Date.now()}`,
+                type: 'referral_bonus',
+                amount: REFERRAL_BONUS,
+                status: 'completed',
+                date: new Date().toISOString(),
+                description: `Signup bonus for using referral code ${signupReferral}.`,
+            };
+            newUser.transactions!.push(newUserBonusTx);
+
+            // 2. Give referrer a bonus
+            referrer.walletBalance += REFERRAL_BONUS;
+            const referrerBonusTx: Transaction = {
+                id: `TXN-REF-EARN-${Date.now()}`,
+                type: 'referral_bonus',
+                amount: REFERRAL_BONUS,
+                status: 'completed',
+                date: new Date().toISOString(),
+                description: `Referral bonus from new user ${newUser.name}.`,
+            };
+            if (!referrer.transactions) referrer.transactions = [];
+            referrer.transactions.push(referrerBonusTx);
+            
+            // 3. Track the referral
+            if (!referrer.referrals) referrer.referrals = [];
+            referrer.referrals.push(newUser.userId);
+            
+            // 4. Update referrer in the users object
+            users[referrer.userId] = referrer;
+        }
+    }
+
+
+    users[userId] = newUser;
     localStorage.setItem('users', JSON.stringify(users));
     
-    localStorage.setItem('loggedInUserId', userId); // Save userId instead of email
+    localStorage.setItem('loggedInUserId', userId);
     localStorage.setItem('welcomeShown', 'false');
     
     toast({
         title: "Account Created!",
-        description: "Welcome to Sociara!"
+        description: "Welcome to Sociara! Check your wallet for a referral bonus."
     });
     router.push('/dashboard');
   };
